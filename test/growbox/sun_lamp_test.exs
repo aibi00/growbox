@@ -15,4 +15,11 @@ defmodule Growbox.SunLampTest do
 
     assert SunLamp.state(pid) == :on
   end
+
+  test "has internal day/night cycle" do
+    {:ok, pid} = SunLamp.start_link([])
+    :timer.sleep(5)
+
+    assert SunLamp.state(pid) == :on
+  end
 end

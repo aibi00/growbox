@@ -1,6 +1,8 @@
 defmodule Growbox.SunLamp do
   use GenServer
 
+  @timestamp "Europe/Vienna"
+
   def start_link([]) do
     GenServer.start_link(__MODULE__, :off)
   end
@@ -18,20 +20,47 @@ defmodule Growbox.SunLamp do
   end
 
   def init(state) do
+    Process.send_after(self(), :tick, 0)
     {:ok, state}
   end
 
   def handle_cast(:on, _state) do
-    # GPIO
-    {:noreply, :on}
+    {:noreply, on!()}
   end
 
   def handle_cast(:off, _state) do
-    # GPIO
-    {:noreply, :off}
+    {:noreply, off!()}
   end
 
   def handle_call(:state, _parent, state) do
     {:reply, state, state}
+  end
+
+  def handle_info(:tick, _state) do
+    time =
+      @timestamp
+      |> DateTime.now!()
+      |> DateTime.to_time()
+
+    state =
+      if Time.compare(time, ~T[20:00:00]) == :lt || Time.compare(time, ~T[06:00:00]) == :gt do
+        on!()
+      else
+        off!()
+      end
+
+    Process.send_after(self(), :tick, 1000)
+
+    {:noreply, state}
+  end
+
+  defp on!() do
+    # GPIO
+    :on
+  end
+
+  defp off!() do
+    # GPIO
+    :off
   end
 end
