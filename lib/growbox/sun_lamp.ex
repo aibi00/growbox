@@ -3,8 +3,11 @@ defmodule Growbox.SunLamp do
 
   @timezone "Europe/Vienna"
 
-  def start_link([]) do
-    GenServer.start_link(__MODULE__, :off)
+  def start_link(pin) do
+    gpio = Application.get_env(:growbox, :gpio, Circuits.GPIO)
+    pin = apply(gpio, :open, [pin, :output])
+
+    GenServer.start_link(__MODULE__, %{lamp: :off, pin: pin})
   end
 
   def on(pid) do
@@ -19,24 +22,26 @@ defmodule Growbox.SunLamp do
     GenServer.call(pid, :state)
   end
 
+  # GenServer API
+
   def init(state) do
     Process.send_after(self(), :tick, 0)
     {:ok, state}
   end
 
-  def handle_cast(:on, _state) do
-    {:noreply, on!()}
+  def handle_cast(:on, state) do
+    {:noreply, on!(state)}
   end
 
-  def handle_cast(:off, _state) do
-    {:noreply, off!()}
+  def handle_cast(:off, state) do
+    {:noreply, off!(state)}
   end
 
   def handle_call(:state, _parent, state) do
-    {:reply, state, state}
+    {:reply, state.lamp, state}
   end
 
-  def handle_info(:tick, _state) do
+  def handle_info(:tick, state) do
     datetime = Application.get_env(:growbox, :datetime, DateTime)
 
     time =
@@ -45,9 +50,9 @@ defmodule Growbox.SunLamp do
 
     state =
       if Time.compare(time, ~T[20:00:00]) == :lt && Time.compare(time, ~T[06:00:00]) == :gt do
-        on!()
+        on!(state)
       else
-        off!()
+        off!(state)
       end
 
     Process.send_after(self(), :tick, 1000)
@@ -55,13 +60,17 @@ defmodule Growbox.SunLamp do
     {:noreply, state}
   end
 
-  defp on!() do
-    # GPIO
-    :on
+  defp on!(state) do
+    gpio_module = Application.get_env(:growbox, :gpio, Circuits.GPIO)
+    apply(gpio_module, :write, [state.pin, 1])
+
+    %{state | lamp: :on}
   end
 
-  defp off!() do
-    # GPIO
-    :off
+  defp off!(state) do
+    gpio_module = Application.get_env(:growbox, :gpio, Circuits.GPIO)
+    apply(gpio_module, :write, [state.pin, 0])
+
+    %{state | lamp: :off}
   end
 end
