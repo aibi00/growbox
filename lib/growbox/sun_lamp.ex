@@ -5,7 +5,7 @@ defmodule Growbox.SunLamp do
 
   def start_link(pin) do
     gpio = Application.get_env(:growbox, :gpio, Circuits.GPIO)
-    pin = apply(gpio, :open, [pin, :output])
+    {:ok, pin} = apply(gpio, :open, [pin, :output])
 
     GenServer.start_link(__MODULE__, %{lamp: :off, pin: pin})
   end
