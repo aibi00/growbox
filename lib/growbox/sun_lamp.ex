@@ -1,7 +1,7 @@
 defmodule Growbox.SunLamp do
   use GenServer
 
-  @timestamp "Europe/Vienna"
+  @timezone "Europe/Vienna"
 
   def start_link([]) do
     GenServer.start_link(__MODULE__, :off)
@@ -37,13 +37,14 @@ defmodule Growbox.SunLamp do
   end
 
   def handle_info(:tick, _state) do
+    datetime = Application.get_env(:growbox, :datetime, DateTime)
+
     time =
-      @timestamp
-      |> DateTime.now!()
+      apply(datetime, :now!, [@timezone])
       |> DateTime.to_time()
 
     state =
-      if Time.compare(time, ~T[20:00:00]) == :lt || Time.compare(time, ~T[06:00:00]) == :gt do
+      if Time.compare(time, ~T[20:00:00]) == :lt && Time.compare(time, ~T[06:00:00]) == :gt do
         on!()
       else
         off!()
