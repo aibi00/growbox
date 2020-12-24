@@ -10,7 +10,7 @@ defmodule Growbox.Application do
       [
         # Starts a worker by calling: Growbox.Worker.start_link(arg)
         # {Growbox.Worker, arg}
-        {Growbox.SunLamp, 5}
+        {Growbox.SunLamp, 4}
       ] ++ children(target())
 
     # See https://hexdocs.pm/elixir/Supervisor.html

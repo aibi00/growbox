@@ -49,7 +49,7 @@ defmodule Growbox.SunLamp do
       |> DateTime.to_time()
 
     state =
-      if Time.compare(time, ~T[20:00:00]) == :lt && Time.compare(time, ~T[06:00:00]) == :gt do
+      if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
         on!(state)
       else
         off!(state)
