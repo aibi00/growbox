@@ -4,11 +4,13 @@ defmodule Growbox.SunLamp do
   @timezone "Europe/Vienna"
 
   def start_link(pin) do
-    gpio = Application.get_env(:growbox, :gpio, Circuits.GPIO)
-    {:ok, pin} = apply(gpio, :open, [pin, :output])
+    {:ok, pin} = apply(gpio_module(), :open, [pin, :output])
 
-    GenServer.start_link(__MODULE__, %{lamp: :off, pin: pin})
+    initial_state = %{lamp: :off, pin: pin}
+    GenServer.start_link(__MODULE__, initial_state)
   end
+
+  # Public API
 
   def on(pid) do
     GenServer.cast(pid, :on)
@@ -30,11 +32,13 @@ defmodule Growbox.SunLamp do
   end
 
   def handle_cast(:on, state) do
-    {:noreply, on!(state)}
+    new_state = on!(state)
+    {:noreply, new_state}
   end
 
   def handle_cast(:off, state) do
-    {:noreply, off!(state)}
+    new_state = off!(state)
+    {:noreply, new_state}
   end
 
   def handle_call(:state, _parent, state) do
@@ -61,16 +65,20 @@ defmodule Growbox.SunLamp do
   end
 
   defp on!(state) do
-    gpio_module = Application.get_env(:growbox, :gpio, Circuits.GPIO)
-    apply(gpio_module, :write, [state.pin, 1])
+    # Circuits.GPIO.write(state.pin, 1) in production
+    # FakeGPIO.write(state.pin, 1) in tests
+    apply(gpio_module(), :write, [state.pin, 1])
 
     %{state | lamp: :on}
   end
 
   defp off!(state) do
-    gpio_module = Application.get_env(:growbox, :gpio, Circuits.GPIO)
-    apply(gpio_module, :write, [state.pin, 0])
+    apply(gpio_module(), :write, [state.pin, 0])
 
     %{state | lamp: :off}
+  end
+
+  defp gpio_module() do
+    Application.get_env(:growbox, :gpio, Circuits.GPIO)
   end
 end
