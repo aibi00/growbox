@@ -1,0 +1,9 @@
+{
+  "name": "Nerves",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "jakebecker.elixir-ls"
+  ]
+}
