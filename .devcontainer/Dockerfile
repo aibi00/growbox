@@ -7,6 +7,6 @@ RUN apt-get install --yes build-essential inotify-tools
 
 RUN mix local.hex --force
 RUN mix local.rebar --force
-RUN mix archive.install hex nerves_bootstrap
+RUN mix archive.install --force hex nerves_bootstrap
 
 WORKDIR /app
