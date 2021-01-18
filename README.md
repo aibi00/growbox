@@ -19,6 +19,7 @@ The ADC i chose is the MCP3008. He ususally runs on 5V but we don't want to hurt
 
 The leds usually have a operation temperatur of 85°C and a total maximum temperatur of 105°C. I want to fully use the 10 bit and 3.3V, so i set the limit to 120°C.
 At 120°C the PT100 has a resitance value of 146.07 Ω. 
+
 3.3V / 146.07 = 22.438mA
 
 This is the constant current i need. Now i just need to design and customize a constant current source. It took me some time but i finally found a simple and temperature resitant source. The current source with LM317 is simple to calculate and it is cheap. From the link below i calculated the resistor to get the needed constant current. 
@@ -33,4 +34,5 @@ A large pump will keep the plants wet with nutritious water, but the Raspberry P
 
 
 read analog signal with Raspberry Pi and MCP3008: https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
+
 current source with LM317: http://www.netzmafia.de/skripten/hardware/LM317/LM317.html
