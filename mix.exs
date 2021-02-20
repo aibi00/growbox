@@ -17,7 +17,8 @@ defmodule Growbox.MixProject do
       releases: [{@app, release()}],
       elixirc_paths: elixirc_paths(Mix.env()),
       preferred_cli_target: [run: :host, test: :host],
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -40,23 +41,21 @@ defmodule Growbox.MixProject do
 
       # Dependencies for all targets
       {:circuits_gpio, "~> 0.4"},
-      {:nerves, "~> 1.7.0", runtime: false},
+      {:nerves, "~> 1.7.4", runtime: false},
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
-      {:nerves_pack, "~> 0.4.0", targets: @all_targets},
+      {:nerves_pack, "~> 0.4.1", targets: @all_targets},
 
       # Dependencies for specific targets
-      {:nerves_system_rpi, "~> 1.13", runtime: false, targets: :rpi},
-      {:nerves_system_rpi0, "~> 1.13", runtime: false, targets: :rpi0},
-      {:nerves_system_rpi2, "~> 1.13", runtime: false, targets: :rpi2},
-      {:nerves_system_rpi3, "~> 1.13", runtime: false, targets: :rpi3},
-      {:nerves_system_rpi3a, "~> 1.13", runtime: false, targets: :rpi3a},
-      {:nerves_system_rpi4, "~> 1.13", runtime: false, targets: :rpi4},
-      {:nerves_system_x86_64, "~> 1.13", runtime: false, targets: :x86_64}
+      {:nerves_system_rpi3, "~> 1.14.0", runtime: false, targets: :rpi3},
+      {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
+
+      # Application dependencies
+      {:phoenix_pubsub, "~> 2.0"}
     ]
   end
 
@@ -67,6 +66,13 @@ defmodule Growbox.MixProject do
       include_erts: &Nerves.Release.erts/0,
       steps: [&Nerves.Release.init/1, :assemble],
       strip_beams: Mix.env() == :prod
+    ]
+  end
+
+  defp aliases do
+    [
+      # (2)
+      test: "test --no-start"
     ]
   end
 end

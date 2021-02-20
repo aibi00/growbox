@@ -34,7 +34,6 @@ asdf install
 mix archive.install hex nerves_bootstrap
 ```
 
-
 - Install mix dependencies
 
 ```sh

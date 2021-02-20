@@ -8,9 +8,9 @@ defmodule Growbox.Application do
   def start(_type, _args) do
     children =
       [
-        # Starts a worker by calling: Growbox.Worker.start_link(arg)
-        # {Growbox.Worker, arg}
-        {Growbox.SunLamp, 4}
+        {Phoenix.PubSub, name: Growbox.PubSub},
+        {Growbox.Lamp, 18},
+        Growbox
       ] ++ children(target())
 
     # See https://hexdocs.pm/elixir/Supervisor.html
