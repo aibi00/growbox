@@ -25,6 +25,7 @@
   "one_dhcpd": {:hex, :one_dhcpd, "0.2.5", "ecec86e567839bde69717abb24c1ae5c74fcdc71beccfce541a0c3149aa980a4", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "4d59693a9998c7dfd6d9f06c556ff23c73c817832f812205a6f09d38250b6dfa"},
   "parse_trans": {:hex, :parse_trans, "3.3.1", "16328ab840cc09919bd10dab29e431da3af9e9e7e7e6f0089dd5a2d2820011d8", [:rebar3], [], "hexpm", "07cd9577885f56362d414e8c4c4e6bdf10d43a8767abb92d24cbe8b24c54888b"},
   "phoenix_pubsub": {:hex, :phoenix_pubsub, "2.0.0", "a1ae76717bb168cdeb10ec9d92d1480fec99e3080f011402c0a2d68d47395ffb", [:mix], [], "hexpm", "c52d948c4f261577b9c6fa804be91884b381a7f8f18450c5045975435350f771"},
+  "pigpiox": {:hex, :pigpiox, "0.1.2", "efbd55fb4b4507aaf44193cf6bf5fbdff288a351bdfed3f31bdc9377ee5623fd", [:mix], [], "hexpm", "c6b05fca2282bb9499181fac2c71a8116b74bb5ac9b853ffbcd1585e9900eec2"},
   "ring_logger": {:hex, :ring_logger, "0.8.1", "ac60613dd20dc9a22d90b7eb89878364540d15a930621d1ade54e68787519f5e", [:mix], [], "hexpm", "34f05823b3188e4f154e09a2d9f13ac6f790a53414ed27b8a29456768a2eef12"},
   "shoehorn": {:hex, :shoehorn, "0.7.0", "fc23870fb6b470f5c520fee692637b120a36e163842ab497bbec7e8a1aa6cfe3", [:mix], [], "hexpm", "eeb317ac677b228906039ccf532a582ad9f6d31d7958c98f5c853fe0459e0243"},
   "socket": {:hex, :socket, "0.3.13", "98a2ab20ce17f95fb512c5cadddba32b57273e0d2dba2d2e5f976c5969d0c632", [:mix], [], "hexpm", "f82ea9833ef49dde272e6568ab8aac657a636acb4cf44a7de8a935acb8957c2e"},

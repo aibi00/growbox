@@ -3,7 +3,7 @@ defmodule Growbox do
 
   @timezone "Europe/Vienna"
 
-  defstruct lamp: {:automatic, :off}
+  defstruct lamp: {:automatic, :off}, brightness: 1
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -17,6 +17,10 @@ defmodule Growbox do
 
   def manual_off(component) do
     GenServer.cast(__MODULE__, {:manual_off, component})
+  end
+
+  def brightness(value) do
+    GenServer.cast(__MODULE__, {:brightness, value})
   end
 
   # GenServer API
@@ -57,6 +61,11 @@ defmodule Growbox do
           state
       end
 
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:brightness, value}, state) do
+    new_state = %{state | brightness: value}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 

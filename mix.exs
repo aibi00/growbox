@@ -55,7 +55,8 @@ defmodule Growbox.MixProject do
       {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
 
       # Application dependencies
-      {:phoenix_pubsub, "~> 2.0"}
+      {:phoenix_pubsub, "~> 2.0"},
+      {:pigpiox, "~> 0.1"}
     ]
   end
 

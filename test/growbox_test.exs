@@ -78,4 +78,19 @@ defmodule GrowboxTest do
       assert_receive %Growbox{lamp: :too_hot}
     end
   end
+
+  describe "brightness/1" do
+    test "sets brightness" do
+      Growbox.start_link([])
+
+      Growbox.brightness(0)
+      assert_receive %Growbox{brightness: 0}
+
+      Growbox.brightness(0.5)
+      assert_receive %Growbox{brightness: 0.5}
+
+      Growbox.brightness(1)
+      assert_receive %Growbox{brightness: 1}
+    end
+  end
 end

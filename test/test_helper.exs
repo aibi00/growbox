@@ -1,6 +1,7 @@
 Application.load(:growbox)
 
-for app <- Application.spec(:growbox, :applications) do
+for app <- Application.spec(:growbox, :applications),
+    app not in [:pigpiox] do
   Application.ensure_all_started(app)
 end
 
