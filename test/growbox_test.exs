@@ -79,18 +79,68 @@ defmodule GrowboxTest do
     end
   end
 
-  describe "brightness/1" do
+  describe "set_brightness/1" do
     test "sets brightness" do
       Growbox.start_link([])
 
-      Growbox.brightness(0)
+      Growbox.set_brightness(0)
       assert_receive %Growbox{brightness: 0}
 
-      Growbox.brightness(0.5)
+      Growbox.set_brightness(0.5)
       assert_receive %Growbox{brightness: 0.5}
 
-      Growbox.brightness(1)
+      Growbox.set_brightness(1)
       assert_receive %Growbox{brightness: 1}
+    end
+  end
+
+  describe "set_pump_on_time/1" do
+    test "sets pump_on_time" do
+      Growbox.start_link([])
+
+      Growbox.set_pump_on_time(9001)
+      assert_receive %Growbox{pump_on_time: 9001}
+    end
+  end
+
+  describe "set_pump_off_time/1" do
+    test "sets pump_off_time" do
+      Growbox.start_link([])
+
+      Growbox.set_pump_off_time(9001)
+      assert_receive %Growbox{pump_off_time: 9001}
+    end
+  end
+
+  describe "pump_cycle/1" do
+    test "automatic mode" do
+      default_state = %Growbox{
+        pump: {:automatic, :off},
+        pump_off_time: 15,
+        pump_on_time: 10
+      }
+
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 14}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 15}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 24}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 25}) == {:automatic, :off}
+    end
+
+    test "manual mode" do
+      default_state = %Growbox{
+        pump: {:manual, :off},
+        pump_off_time: 15,
+        pump_on_time: 10
+      }
+
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) == {:manual, :off}
+
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 0}) ==
+               {:manual, :on}
+
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 15}) ==
+               {:manual, :on}
     end
   end
 end

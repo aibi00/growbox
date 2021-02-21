@@ -3,7 +3,14 @@ defmodule Growbox do
 
   @timezone "Europe/Vienna"
 
-  defstruct lamp: {:automatic, :off}, brightness: 1
+  defstruct lamp: {:automatic, :off},
+            brightness: 1,
+            pump: {:automatic, :off},
+            # 15 mins
+            pump_off_time: 900,
+            # 10 mins
+            pump_on_time: 600,
+            counter: 0
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -19,8 +26,16 @@ defmodule Growbox do
     GenServer.cast(__MODULE__, {:manual_off, component})
   end
 
-  def brightness(value) do
+  def set_brightness(value) do
     GenServer.cast(__MODULE__, {:brightness, value})
+  end
+
+  def set_pump_off_time(value) do
+    GenServer.cast(__MODULE__, {:pump_off_time, value})
+  end
+
+  def set_pump_on_time(value) do
+    GenServer.cast(__MODULE__, {:pump_on_time, value})
   end
 
   # GenServer API
@@ -69,9 +84,42 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_cast({:pump_off_time, value}, state) do
+    new_state = %{state | pump_off_time: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:pump_on_time, value}, state) do
+    new_state = %{state | pump_on_time: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   def handle_info(:tick, state) do
+    new_state =
+      case state.pump do
+        {:automatic, _} -> %{state | counter: state.counter + 1}
+        {_, _} -> state
+      end
+
+    new_state = %{new_state | pump: pump_cycle(new_state)}
+
     Process.send_after(self(), :tick, :timer.seconds(1))
-    {:noreply, state, {:continue, :broadcast}}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
+    # counter % pump_on + pump_off
+    modulus = rem(state.counter, state.pump_off_time + state.pump_on_time)
+
+    if modulus < state.pump_off_time do
+      {:automatic, :off}
+    else
+      {:automatic, :on}
+    end
+  end
+
+  def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
+    state.pump
   end
 
   def handle_info({:automatic_on_or_off, :lamp}, state) do
@@ -95,5 +143,24 @@ defmodule Growbox do
     else
       :off
     end
+  end
+
+  def handle_info({:automatic_on_or_off, :pump}, state) do
+    new_state = %{state | pump: {:automatic, :off}}
+    new_state = %{new_state | pump: pump_cycle(new_state)}
+
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:manual_on, :pump}, state) do
+    new_state = %{state | pump: {:manual, :on}}
+    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:manual_off, :pump}, state) do
+    new_state = %{state | pump: {:manual, :off}}
+    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
+    {:noreply, new_state, {:continue, :broadcast}}
   end
 end
