@@ -11,14 +11,35 @@ defmodule Growbox.MixProject do
       app: @app,
       version: @version,
       elixir: "~> 1.10",
+      elixirc_paths: elixirc_paths(Mix.env()),
       archives: [nerves_bootstrap: "~> 1.9"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
       releases: [{@app, release()}],
-      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix] ++ Mix.compilers(),
       preferred_cli_target: [run: :host, test: :host],
-      deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      deps: deps()
+    ]
+  end
+
+  # Configuration for the OTP application.
+  #
+  # Type `mix help compile.app` for more information.
+  def application do
+    [
+      mod: {Growbox.Application, []},
+      extra_applications: [:logger, :runtime_tools]
+    ]
+  end
+
+  def release do
+    [
+      overwrite: true,
+      cookie: "#{@app}_cookie",
+      include_erts: &Nerves.Release.erts/0,
+      steps: [&Nerves.Release.init/1, :assemble],
+      strip_beams: Mix.env() == :prod
     ]
   end
 
@@ -26,21 +47,15 @@ defmodule Growbox.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  # Run "mix help compile.app" to learn about applications.
-  def application do
-    [
-      extra_applications: [:logger],
-      mod: {Growbox.Application, []}
-    ]
-  end
-
-  # Run "mix help deps" to learn about dependencies.
+  # Specifies your project dependencies.
+  #
+  # Type `mix help deps` for examples and options.
   defp deps do
     [
       {:tzdata, "~> 1.0"},
 
       # Dependencies for all targets
-      {:circuits_gpio, "~> 0.4"},
+      {:circuits_gpio, "~> 0.4", targets: @all_targets},
       {:nerves, "~> 1.7.4", runtime: false},
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
@@ -55,24 +70,31 @@ defmodule Growbox.MixProject do
       {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
 
       # Application dependencies
-      {:phoenix_pubsub, "~> 2.0"}
+      {:phoenix_pubsub, "~> 2.0"},
+
+      # Phoenix dependencies
+      {:phoenix, "~> 1.5.7"},
+      {:phoenix_live_view, "~> 0.15.0"},
+      {:floki, ">= 0.27.0", only: :test},
+      {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_dashboard, "~> 0.4"},
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_poller, "~> 0.4"},
+      {:jason, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"}
     ]
   end
 
-  def release do
-    [
-      overwrite: true,
-      cookie: "#{@app}_cookie",
-      include_erts: &Nerves.Release.erts/0,
-      steps: [&Nerves.Release.init/1, :assemble],
-      strip_beams: Mix.env() == :prod
-    ]
-  end
-
+  # Aliases are shortcuts or tasks specific to the current project.
+  # For example, to install project dependencies and perform other setup tasks, run:
+  #
+  #     $ mix setup
+  #
+  # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      # (2)
-      test: "test --no-start"
+      setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"]
     ]
   end
 end

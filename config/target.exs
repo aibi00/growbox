@@ -1,5 +1,7 @@
 import Config
 
+config :logger, backends: [RingLogger]
+
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
 # involved with firmware updates.

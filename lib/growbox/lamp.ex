@@ -2,8 +2,12 @@ defmodule Growbox.Lamp do
   use GenServer
 
   def start_link(pin) do
-    {:ok, pin} = apply(gpio_module(), :open, [pin, :output])
-    GenServer.start_link(__MODULE__, pin)
+    if Code.ensure_loaded?(gpio_module()) do
+      {:ok, pin} = apply(gpio_module(), :open, [pin, :output])
+      GenServer.start_link(__MODULE__, pin)
+    else
+      :ignore
+    end
   end
 
   def init(pin) do
