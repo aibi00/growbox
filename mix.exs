@@ -56,6 +56,7 @@ defmodule Growbox.MixProject do
 
       # Dependencies for all targets
       {:circuits_gpio, "~> 0.4", targets: @all_targets},
+      {:pigpiox, "~> 0.1", targets: @all_targets},
       {:nerves, "~> 1.7.4", runtime: false},
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
@@ -69,14 +70,11 @@ defmodule Growbox.MixProject do
       {:nerves_system_rpi3, "~> 1.14.0", runtime: false, targets: :rpi3},
       {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
 
-      # Application dependencies
-      {:phoenix_pubsub, "~> 2.0"},
-      {:pigpiox, "~> 0.1"},
-
       # Phoenix dependencies
       {:phoenix, "~> 1.5.7"},
       {:phoenix_live_view, "~> 0.15.0"},
       {:floki, ">= 0.27.0", only: :test},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_dashboard, "~> 0.4"},

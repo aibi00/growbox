@@ -2,7 +2,7 @@ defmodule Growbox.Lamp do
   use GenServer
 
   def start_link(pin) do
-    if Code.ensure_loaded?(gpio_module()) do
+    if Code.ensure_loaded?(pwm_module()) do
       GenServer.start_link(__MODULE__, pin)
     else
       :ignore
