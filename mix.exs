@@ -71,6 +71,7 @@ defmodule Growbox.MixProject do
 
       # Application dependencies
       {:phoenix_pubsub, "~> 2.0"},
+      {:pigpiox, "~> 0.1"},
 
       # Phoenix dependencies
       {:phoenix, "~> 1.5.7"},
