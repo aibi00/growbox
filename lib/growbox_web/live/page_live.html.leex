@@ -1,0 +1,14 @@
+<h1>Growbox</h1>
+
+<h2>Lamp</h2>
+
+<p>
+  <button phx-click="lamp-on">On</button>
+  <button phx-click="lamp-off">Off</button>
+</p>
+
+<pre>
+  <%= for message <- Enum.reverse(@messages) do %>
+    <%= inspect message %>
+  <% end %>
+</pre>

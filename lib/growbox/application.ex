@@ -6,15 +6,15 @@ defmodule Growbox.Application do
   use Application
 
   def start(_type, _args) do
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
     children =
       [
         {Phoenix.PubSub, name: Growbox.PubSub},
-        {Growbox.Lamp, 18},
-        Growbox
+        GrowboxWeb.Telemetry,
+        GrowboxWeb.Endpoint
       ] ++ children(target())
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
     Supervisor.start_link(children, opts)
   end
@@ -28,14 +28,20 @@ defmodule Growbox.Application do
   end
 
   def children(_target) do
-    [
-      # Children for all targets except host
-      # Starts a worker by calling: Firmware.Worker.start_link(arg)
-      # {Firmware.Worker, arg},
-    ]
+    Application.get_env(:growbox, :child_processes, [
+      {Growbox.Lamp, 18},
+      Growbox
+    ])
   end
 
   def target() do
     Application.get_env(:firmware, :target)
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  def config_change(changed, _new, removed) do
+    GrowboxWeb.Endpoint.config_change(changed, removed)
+    :ok
   end
 end

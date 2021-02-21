@@ -11,52 +11,25 @@ defmodule Growbox.MixProject do
       app: @app,
       version: @version,
       elixir: "~> 1.10",
+      elixirc_paths: elixirc_paths(Mix.env()),
       archives: [nerves_bootstrap: "~> 1.9"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
       releases: [{@app, release()}],
-      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix] ++ Mix.compilers(),
       preferred_cli_target: [run: :host, test: :host],
-      deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      deps: deps()
     ]
   end
 
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
-
-  # Run "mix help compile.app" to learn about applications.
+  # Configuration for the OTP application.
+  #
+  # Type `mix help compile.app` for more information.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Growbox.Application, []}
-    ]
-  end
-
-  # Run "mix help deps" to learn about dependencies.
-  defp deps do
-    [
-      {:tzdata, "~> 1.0"},
-
-      # Dependencies for all targets
-      {:circuits_gpio, "~> 0.4"},
-      {:nerves, "~> 1.7.4", runtime: false},
-      {:shoehorn, "~> 0.7.0"},
-      {:ring_logger, "~> 0.8.1"},
-      {:toolshed, "~> 0.2.13"},
-
-      # Dependencies for all targets except :host
-      {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
-      {:nerves_pack, "~> 0.4.1", targets: @all_targets},
-
-      # Dependencies for specific targets
-      {:nerves_system_rpi3, "~> 1.14.0", runtime: false, targets: :rpi3},
-      {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
-
-      # Application dependencies
-      {:phoenix_pubsub, "~> 2.0"},
-      {:pigpiox, "~> 0.1"}
+      mod: {Growbox.Application, []},
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -70,10 +43,57 @@ defmodule Growbox.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  # Specifies your project dependencies.
+  #
+  # Type `mix help deps` for examples and options.
+  defp deps do
+    [
+      {:tzdata, "~> 1.0"},
+
+      # Dependencies for all targets
+      {:circuits_gpio, "~> 0.4", targets: @all_targets},
+      {:pigpiox, "~> 0.1", targets: @all_targets},
+      {:nerves, "~> 1.7.4", runtime: false},
+      {:shoehorn, "~> 0.7.0"},
+      {:ring_logger, "~> 0.8.1"},
+      {:toolshed, "~> 0.2.13"},
+
+      # Dependencies for all targets except :host
+      {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
+      {:nerves_pack, "~> 0.4.1", targets: @all_targets},
+
+      # Dependencies for specific targets
+      {:nerves_system_rpi3, "~> 1.14.0", runtime: false, targets: :rpi3},
+      {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
+
+      # Phoenix dependencies
+      {:phoenix, "~> 1.5.7"},
+      {:phoenix_live_view, "~> 0.15.0"},
+      {:floki, ">= 0.27.0", only: :test},
+      {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_dashboard, "~> 0.4"},
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_poller, "~> 0.4"},
+      {:jason, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"}
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  # For example, to install project dependencies and perform other setup tasks, run:
+  #
+  #     $ mix setup
+  #
+  # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      # (2)
-      test: "test --no-start"
+      setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"]
     ]
   end
 end
