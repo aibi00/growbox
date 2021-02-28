@@ -30,6 +30,7 @@ defmodule Growbox.Application do
   def children(_target) do
     Application.get_env(:growbox, :child_processes, [
       {Growbox.Lamp, 18},
+      {Growbox.Pump, 4},
       Growbox
     ])
   end
