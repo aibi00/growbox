@@ -18,18 +18,28 @@ With a constant current source through the PT100. But how many amps do we need? 
 The ADC i chose is the MCP3008. He ususally runs on 5V but we don't want to hurt the Raspberry Pi, so the ADC will be powered with 3.3V. The MCP3008 has 8 analog inputs and 10 bit resolution. 
 
 The leds usually have a operation temperatur of 85°C and a total maximum temperatur of 105°C. I want to fully use the 10 bit and 3.3V, so i set the limit to 120°C.
-At 120°C the PT100 has a resitance value of 146.07 Ω. 
+At 120°C the PT100 has a resitance value of 146.07 Ω. 
 
 3.3V / 146.07 = 22.438mA
 
 This is the constant current i need. Now i just need to design and customize a constant current source. It took me some time but i finally found a simple and temperature resitant source. The current source with LM317 is simple to calculate and it is cheap. From the link below i calculated the resistor to get the needed constant current. 
-(Iout = 1.25 / R) => R = 1.25 / Iout = 55.709 Ω. 
+(Iout = 1.25 / R) => R = 1.25 / Iout = 55.709 Ω. 
 
 In order not to falsify the measurement, an impedance converter is placed between the ADC and PT100. 
 Temperatur measurement is ready to programm. 
 
 # large pump
-A large pump will keep the plants wet with nutritious water, but the Raspberry Pi can't drive the pump so i need a small circuit with a relay, a transistor and a free-wheeling diode. The relay that is used is the 40.52. 
+A large pump will keep the plants wet with nutritious water, but the Raspberry Pi can't drive the pump so i need a small circuit with a relay, a transistor and a free-wheeling diode. The relay that is used is the 40.52. When you start the growbox, you have to enter two intervals on the website. First interval is the time how long you want to water the plants and the second one is the time between watering. 
+
+# small pumps
+In the growbox will be four small tanks with pumps in it. In the first tank will be normal water to fill up the large tank. One small tanks will be filled with a pH-value rising liquid and the other one will be filled with a pH-value sinking liquid. The acidity will be measured by a special pH-sensor. In the fourth tank will be the nutritious solution for the plants. All tanks are equipped with swim-switches. A notification will be shown on the website if one switch report not enough liquid. Every pump has its own logic.
+
+# swim switches
+In total there will be five switches to check fluid level. 
+
+# website
+The website is runnig on the rasberry pi and it will show some data in graphs like the temperatur, pH-value, nutrient solution. The user can switch manually switch on or off the large pump and leds. On the website the user can enter the intervals for the pump and the brightness for the plants. A camera will take every 30mins a photo and at the end of the growing process the photos will be edited together to a time-lapse-video. 
+
 
 
 
