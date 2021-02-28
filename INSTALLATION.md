@@ -1,4 +1,4 @@
-# Installation on Ubuntu
+# Installation
 
 - Dependencies
 
@@ -37,5 +37,23 @@ mix archive.install hex nerves_bootstrap
 - Install mix dependencies
 
 ```sh
+export MIX_TARGET=rpi3
 mix deps.get
 ```
+
+- Flashing the Raspberry PI
+
+```sh
+MIX_ENV=prod MIX_TARGET=rpi3 mix do firmware, firmware.burn
+```
+
+## Troubleshooting
+
+- Failing to compile `:nerves_runtime`:
+
+```
+could not compile dependency :nerves_runtime, "mix compile" failed. You can recompile this dependency with "mix deps.compile nerves_runtime", update it with "mix deps.update nerves_runtime" or clean it with "mix deps.clean nerves_runtime"
+```
+
+Can be fix via `brew install fwup squashfs coreutils xz pkg-config`.
+Also see https://github.com/nerves-project/nerves/blob/main/docs/Installation.md#macos
