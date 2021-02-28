@@ -3,12 +3,12 @@ defmodule Growbox.Pump do
 
   def start_link(pin) do
     gpio = Application.get_env(:growbox, :gpio, Circuits.GPIO)
-    pin = apply(gpio, :open, [pin, :output])
+    {:ok, pin} = apply(gpio, :open, [pin, :output])
 
     GenServer.start_link(__MODULE__, pin)
   end
 
-  def init(pin) do
+  def init(pin) when is_reference(pin) do
     Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
     {:ok, pin}
   end
