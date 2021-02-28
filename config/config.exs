@@ -28,6 +28,7 @@ else
 end
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+config :tzdata, :autoupdate, :disabled
 
 # Phoenix configuration
 
