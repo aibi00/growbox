@@ -43,6 +43,8 @@ The website is runnig on the rasberry pi and it will show some data in graphs li
 
 
 
-read analog signal with Raspberry Pi and MCP3008: https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
 
+
+read analog signal with Raspberry Pi and MCP3008: https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
+https://dev.to/mnishiguchi/elixir-nerves-potentiometer-with-spi-based-analog-to-digital-converter-25h1
 current source with LM317: http://www.netzmafia.de/skripten/hardware/LM317/LM317.html
