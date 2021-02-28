@@ -1,5 +1,16 @@
 import Config
 
+config :growbox, GrowboxWeb.Endpoint,
+  url: [host: "nerves.local", port: 80],
+  http: [port: 80],
+  check_origin: false,
+  server: true,
+  secret_key_base: "RK4tj8xps4XLl1WZCI1+U22iyqOefXAmeFLx1cc0HTdPW6mFP7SVAUxUSExtH0Jw",
+  render_errors: [view: GrowboxWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Growbox.PubSub,
+  live_view: [signing_salt: "1XpzdHRX"],
+  code_reloader: false
+
 config :logger, backends: [RingLogger]
 
 # Use shoehorn to start the main application. See the shoehorn

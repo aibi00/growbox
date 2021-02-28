@@ -21,12 +21,6 @@ config :nerves, source_date_epoch: "1577975236"
 
 config :logger, backends: [RingLogger, :console]
 
-if Mix.target() == :host or Mix.target() == :"" do
-  import_config "host.exs"
-else
-  import_config "target.exs"
-end
-
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :tzdata, :autoupdate, :disabled
 
@@ -51,3 +45,9 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
+
+if Mix.target() == :host or Mix.target() == :"" do
+  import_config "host.exs"
+else
+  import_config "target.exs"
+end
