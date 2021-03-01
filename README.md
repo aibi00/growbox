@@ -35,7 +35,7 @@ A large pump will keep the plants wet with nutritious water, but the Raspberry P
 In the growbox will be four small tanks with pumps in it. In the first tank will be normal water to fill up the large tank. One small tanks will be filled with a pH-value rising liquid and the other one will be filled with a pH-value sinking liquid. The acidity will be measured by a special pH-sensor. In the fourth tank will be the nutritious solution for the plants. All tanks are equipped with swim-switches. A notification will be shown on the website if one switch report not enough liquid. Every pump has its own logic.
 
 # swim switches
-In total there will be five switches to check fluid level. 
+In total there will be six switches to check fluid level. 
 
 # website
 The website is runnig on the rasberry pi and it will show some data in graphs like the temperatur, pH-value, nutrient solution. The user can switch manually switch on or off the large pump and leds. On the website the user can enter the intervals for the pump and the brightness for the plants. A camera will take every 30mins a photo and at the end of the growing process the photos will be edited together to a time-lapse-video. 
