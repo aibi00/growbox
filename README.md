@@ -32,19 +32,44 @@ Temperatur measurement is ready to programm.
 A large pump will keep the plants wet with nutritious water, but the Raspberry Pi can't drive the pump so i need a small circuit with a relay, a transistor and a free-wheeling diode. The relay that is used is the 40.52. When you start the growbox, you have to enter two intervals on the website. First interval is the time how long you want to water the plants and the second one is the time between watering. 
 
 # small pumps
-In the growbox will be four small tanks with pumps in it. In the first tank will be normal water to fill up the large tank. One small tanks will be filled with a pH-value rising liquid and the other one will be filled with a pH-value sinking liquid. The acidity will be measured by a special pH-sensor. In the fourth tank will be the nutritious solution for the plants. All tanks are equipped with swim-switches. A notification will be shown on the website if one switch report not enough liquid. Every pump has its own logic.
+In the growbox will be four small tanks with pumps in it. In the first tank will be normal water to fill up the large tank. One small tanks will be filled with a pH-value rising liquid and the other one will be filled with a pH-value sinking liquid. The acidity will be measured by a special pH-sensor. In the fourth tank will be the nutritious solution for the plants. All tanks are equipped with swim-switches. A notification will be shown on the website if one switch report not enough liquid. Every pump has its own logic. But every pump will only be active, when the large pump is off. 
+All small pumps are running on 12V. To control them a LM293D will be used. Its a simple motor driver. At the end of the documentation you can find a link to the L293D.
 
 # swim switches
 In total there will be six switches to check fluid level. 
 
 # website
-The website is runnig on the rasberry pi and it will show some data in graphs like the temperatur, pH-value, nutrient solution. The user can switch manually switch on or off the large pump and leds. On the website the user can enter the intervals for the pump and the brightness for the plants. A camera will take every 30mins a photo and at the end of the growing process the photos will be edited together to a time-lapse-video. 
+The website is runnig on the rasberry pi and it will show some data in graphs like the temperatur, pH-value, nutrient solution. The user can switch manually switch on or off the large pump and leds. But after 10min the pump and leds will return to the automatic mode. On the website the user can enter the intervals for the pump and the brightness for the plants. A camera will take every 30mins a photo and at the end of the growing process the photos will be edited together to a time-lapse-video. 
 
+# TDS sensor
+In the large tank will be a TDS sensor to check the quality of the water. The output is a analog voltage which will be digitalized by a MCP3008. The value of the treshold is also an input from the user on the website. When the water quality is sinking, the small pump in the small tank with nutrient solution in it will be activated for 1s. 
 
+# pH value sensor
+The pH value sensor will also be in the large tank. It will also deliver an anlog voltage which will also be digitalized. The pH value must not fall under 5,5 and must not rise above 6,5. To stabilize the value, two small pumps will pump pH rising and sinking fluid into the large tank for 1s. 
 
+# water tank
+In one of the four small tanks will only be water. The pump will only be activated if to less water is in the large tank. The time is calculated by using the pump rate. 
 
+# LM293D
+To control all the small pumps, this chip will be used. Below you can find the link for the datasheet. It can be controlled by 5V but can drive motors with higher voltage. The raspberry pi only has to turn gpios on and off.
+
+# MCP3008
+The raspberry pi cant work with analog signals. But it has two SPI buses which can be used for ADCs like the MCP3008. Below you can find again the libary and tutorial how you can digitalize analog signal by using MCP300x and Elixir.
+
+# Code
+Now i will explain how my code works. Elixir is a functional programming language. The Website is a process which is running on its own and the growbox is also a process. Between these two is a connection for communtication. For this communication the libary pubsub is used. The growbox is responisble for the whole logic and it will tick and send the complete state to the website which will show it in graphs. But between the growbox and the website all the stuff to control and get data are hanging in the line. They are also working on themself as processes. I will add a picture, so you can better understand how everything works. Some libaries are needed to control everything.
+
+# LEDs
+On the website the user enters the max brightness for the LEDs. The growbox process will adjust the duty-cycle of the signal. A day-night-cycle will control the leds so they turn automatically on and off at 6:00 o Clock in the morning and 8:00 o Clock in the evening. 
 
 
 read analog signal with Raspberry Pi and MCP3008: https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
 https://dev.to/mnishiguchi/elixir-nerves-potentiometer-with-spi-based-analog-to-digital-converter-25h1
 current source with LM317: http://www.netzmafia.de/skripten/hardware/LM317/LM317.html
+
+MCP3008: https://dev.to/mnishiguchi/elixir-nerves-potentiometer-with-spi-based-analog-to-digital-converter-25h1
+https://hexdocs.pm/circuits_spi/Circuits.SPI.html
+
+LM293D:
+https://www.ti.com/lit/ds/symlink/l293.pdf
+
