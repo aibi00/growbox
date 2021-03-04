@@ -64,23 +64,23 @@ To test the code without a raspberry pi, elixir offers the possibility to run te
 On the website the user enters the max brightness for the LEDs. The grow box process will adjust the duty-cycle of the signal. A day-night-cycle will control the leds so they turn automatically on and off at 6:00 o Clock in the morning and 8:00 o Clock in the evening. 
 
 # used parts
-1x Raspberry Pi 3B+
-1x SD Card
-3x LM317D
-3x PT100
-3x 56Ω resistor
-1x L293D
-1x MCP3008
-1x 40.52 relay
-1x 1N4148
-3x small pumps
-1x large pump
-1x power supply (12V / 60W)
-1x TDS sensor
-1x pH sensor
-1x TL084
-1x Step Down Converter (12V / 5V)
-3x capacitor (10uF)
+1x Raspberry Pi 3B+ |
+1x SD Card |
+3x LM317D |
+3x PT100 |
+3x 56Ω resistor |
+1x L293D |
+1x MCP3008 |
+1x 40.52 relay |
+1x 1N4148 |
+3x small pumps |
+1x large pump |
+1x power supply (12V / 60W) |
+1x TDS sensor |
+1x pH sensor |
+1x TL084 |
+1x Step Down Converter (12V / 5V) | 
+3x capacitor (10uF)|
 clamps and wires
 
 
