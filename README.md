@@ -7,7 +7,7 @@ For this project I will use a Raspberry Pi 3. The programming language is Elixir
 In our grow box are a few sensors to get temperature, water levels and quality. The inputs can be seen on a website, which is also running on the Pi. A camera will take photos and make a time-lapse video. In total we will have five pumps. Four of them will be in small tanks with water, nutrient solution and a liquid to bring down the pH value of the water in the larger tank. In the larger tank all liquids are mixed together and the fourth pump will water the plants with it.
 
 # hat
-To read all these sensors and control the pumps I will design my own Raspberry Pi Header. I'll design it with the software EAGLE from autodesk. On the board will be three current sources, an ADC, a circuit to control a relays and several clamps.
+To read all these sensors and control all pumps a unique hat for the raspberry pi must be designed. To design such a board the software EAGLE from autodesk is perfect. On the board will be three current sources, an ADC, a circuit to control a relays and several clamps. But the raspberry pi tends to overheat without the right cooling. An old PC fan will do the thing.
 
 # measuring the temperature
 To control the leds, we have to know their temperature. For this i will use three PT100. A PT100 is a temperature-dependent resistor and with the formula you can calculate every value at a temperature. In electrical measuring technology only voltage can be measured. 
@@ -29,14 +29,14 @@ In order not to falsify the measurement, an impedance converter is placed betwee
 Temperatur measurement is ready to program. 
 
 # large pump
-A large pump will keep the plants wet with nutritious water, but the Raspberry Pi can't drive the pump so i need a small circuit with a relay, a transistor and a free-wheeling diode. The relay that is used is the 40.52. When you start the grow box, you have to enter two intervals on the website. First interval is the time how long you want to water the plants and the second one is the time between watering. 
+A large pump will keep the plants wet with nutritious water, but the Raspberry Pi can't drive the pump so a small circuit with a relay, a transistor and a free-wheeling diode is needed. The relay that is used is the 40.52. When you start the grow box, you have to enter two intervals on the website. First interval is the time how long you want to water the plants and the second one is the time between watering. 
 
 # small pumps
 In the grow box will be four small tanks with pumps in it. In the first tank will be normal water to fill up the large tank. One small tanks will be filled with a pH-value rising liquid and the other one will be filled with a pH-value sinking liquid. The acidity will be measured by a special pH-sensor. In the fourth tank will be the nutritious solution for the plants. All tanks are equipped with swim-switches. A notification will be shown on the website if one switch report not enough liquid. Every pump has its own logic. But every pump will only be active, when the large pump is off. 
 All small pumps are running on 12V. To control them a LM293D will be used. Its a simple motor driver. At the end of the documentation you can find a link to the L293D.
 
 # swim switches
-In total there will be six switches to check fluid level. 
+In total there will be two switches to check fluid level. On the website will be an alarm shown to fill in some water.
 
 # website
 The website is running on the raspberry pi and it will show some data in graphs like the temperature, pH-value, nutrient solution. The user can switch manually switch on or off the large pump and leds. But after 10min the pump and leds will return to the automatic mode. On the website the user can enter the intervals for the pump and the brightness for the plants. A camera will take every 30mins a photo and at the end of the growing process the photos will be edited together to a time-lapse-video. 
@@ -48,13 +48,13 @@ In the large tank will be a TDS sensor to check the quality of the water. The ou
 The pH value sensor will also be in the large tank. It will also deliver an anlog voltage which will also be digitalized. The pH value must not fall under 5,5 and must not rise above 6,5. To stabilize the value, two small pumps will pump pH rising and sinking fluid into the large tank for 1s. 
 
 # water tank
-In one of the four small tanks will only be water. The pump will only be activated if to less water is in the large tank. The time is calculated by using the pump rate. 
+In one of the four small tanks will only be water. The pump will only be activated if to less water is in the large tank. The time how long to pump, is calculated by using the pump rate. 
 
 # LM293D
-To control all the small pumps, this chip will be used. Below you can find the link for the data sheet. It can be controlled by 5V but can drive motors with higher voltage. The raspberry pi only has to turn gpios on and off.
+To control all the small pumps, this chip will be used. Below you can find the link for the data sheet. It can be controlled by 5V but can drive motors with higher voltage. The raspberry pi only has to turn gpios on and off. 
 
 # MCP3008
-The raspberry pi cant work with analog signals. But it has two SPI buses which can be used for ADCs like the MCP3008. Below you can find again the library and tutorial how you can digitalize analog signal by using MCP300x and Elixir.
+The raspberry pi cant work with analog signals. But it has two SPI buses which can be used for ADCs like the MCP3008. Below you can find again the library and tutorial how you can digitalize analog signal by using MCP300x and Elixir and the datasheet. On CH0 - CH4 are the PT100s and the pH- and TDS-sensor because their outputs are analog signals.
 
 # Code
 Now i will explain how my code works. Elixir is a functional programming language. The Website is a process which is running on its own and the grow box is also a process. Between these two is a connection for communication. For this communication the library pub-sub is used. The grow box is responsible for the whole logic and it will tick and send the complete state to the website which will show it in graphs. But between the grow box and the website all the stuff to control and get data are hanging in the line. They are also working on themself as processes. Some libraries are needed to control everything like for pwm and gpios.
@@ -94,3 +94,5 @@ https://hexdocs.pm/circuits_spi/Circuits.SPI.html
 LM293D:
 https://www.ti.com/lit/ds/symlink/l293.pdf
 
+libarys:
+https://hex.pm
