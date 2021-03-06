@@ -134,7 +134,8 @@ defmodule GrowboxTest do
         pump_on_time: 10
       }
 
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) == {:manual, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) ==
+               {:manual, :off}
 
       assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 0}) ==
                {:manual, :on}

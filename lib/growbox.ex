@@ -10,7 +10,11 @@ defmodule Growbox do
             pump_off_time: 900,
             # 10 mins
             pump_on_time: 600,
-            counter: 0
+            counter: 0,
+            water_pump: :off,
+            ph_up_pump: :off,
+            ph_down_pump: :off,
+            nutrient_pump: :off
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
