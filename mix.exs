@@ -60,11 +60,16 @@ defmodule Growbox.MixProject do
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
 
+      # Sensors and stuff
+      {:circuits_gpio, "~> 0.4"},
+      {:pigpiox, "~> 0.1", targets: @all_targets},
+      # {:circuits_spi, "~> 0.1.5"},
+      # {:mcp3008, "~> 0.1.0"},
+      {:mcp300x, "~> 0.1.1"},
+
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
       {:nerves_pack, "~> 0.4.1", targets: @all_targets},
-      {:circuits_gpio, "~> 0.4", targets: @all_targets},
-      {:pigpiox, "~> 0.1", targets: @all_targets},
 
       # Dependencies for specific targets
       {:nerves_system_rpi3, "~> 1.14.0", runtime: false, targets: :rpi3},
