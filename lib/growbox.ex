@@ -14,7 +14,8 @@ defmodule Growbox do
             water_pump: :off,
             ph_up_pump: :off,
             ph_down_pump: :off,
-            nutrient_pump: :off
+            nutrient_pump: :off,
+            water_level: :enough
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -40,6 +41,10 @@ defmodule Growbox do
 
   def set_pump_on_time(value) do
     GenServer.cast(__MODULE__, {:pump_on_time, value})
+  end
+
+  def set_water_level(value) do
+    GenServer.cast(__MODULE__, {:water_level, value})
   end
 
   # GenServer API
@@ -95,6 +100,11 @@ defmodule Growbox do
 
   def handle_cast({:pump_on_time, value}, state) do
     new_state = %{state | pump_on_time: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:water_level, value}, state) do
+    new_state = %{state | water_level: value}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 

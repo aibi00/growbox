@@ -35,6 +35,7 @@ defmodule Growbox.Application do
       {Growbox.SmallPump, [6, :ph_up_pump]},
       {Growbox.SmallPump, [16, :ph_down_pump]},
       {Growbox.SmallPump, [26, :nutrient_pump]},
+      {Growbox.WaterLevel, [27, 22]},
       Growbox
     ])
   end
