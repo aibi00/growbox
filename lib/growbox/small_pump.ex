@@ -1,6 +1,15 @@
 defmodule Growbox.SmallPump do
   use GenServer
 
+  def child_spec([pin, name]) do
+    default = %{
+      id: name,
+      start: {__MODULE__, :start_link, [pin, name]}
+    }
+
+    Supervisor.child_spec(default, [])
+  end
+
   def start_link(pin, name) do
     gpio = Application.get_env(:growbox, :gpio, Circuits.GPIO)
     {:ok, pin} = apply(gpio, :open, [pin, :output])

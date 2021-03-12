@@ -15,7 +15,7 @@ defmodule Growbox.WaterLevelTest do
   end
 
   test "reading both low", %{max: max, min: min} do
-    {:ok, pid} = WaterLevel.start_link(1, 3)
+    {:ok, pid} = WaterLevel.start_link([1, 3])
 
     Circuits.GPIO.write(max, 0)
     Circuits.GPIO.write(min, 0)
@@ -27,7 +27,7 @@ defmodule Growbox.WaterLevelTest do
   end
 
   test "reading only min high", %{max: max, min: min} do
-    {:ok, pid} = WaterLevel.start_link(1, 3)
+    {:ok, pid} = WaterLevel.start_link([1, 3])
 
     Circuits.GPIO.write(max, 0)
     Circuits.GPIO.write(min, 1)
@@ -40,7 +40,7 @@ defmodule Growbox.WaterLevelTest do
 
   @tag :capture_log
   test "reading only max high", %{max: max, min: min} do
-    {:ok, pid} = WaterLevel.start_link(1, 3)
+    {:ok, pid} = WaterLevel.start_link([1, 3])
 
     Circuits.GPIO.write(max, 1)
     Circuits.GPIO.write(min, 0)
@@ -55,7 +55,7 @@ defmodule Growbox.WaterLevelTest do
   end
 
   test "reading both high", %{max: max, min: min} do
-    {:ok, pid} = WaterLevel.start_link(1, 3)
+    {:ok, pid} = WaterLevel.start_link([1, 3])
 
     Circuits.GPIO.write(max, 1)
     Circuits.GPIO.write(min, 1)

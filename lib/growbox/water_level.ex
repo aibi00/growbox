@@ -1,7 +1,7 @@
 defmodule Growbox.WaterLevel do
   use GenServer
 
-  def start_link(max, min) do
+  def start_link([max, min]) do
     {:ok, max} = Circuits.GPIO.open(max, :input)
     {:ok, min} = Circuits.GPIO.open(min, :input)
 

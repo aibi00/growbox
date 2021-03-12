@@ -12,7 +12,8 @@ defmodule Growbox.Application do
       [
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
-        GrowboxWeb.Endpoint
+        GrowboxWeb.Endpoint,
+        Growbox
       ] ++ children(target())
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
@@ -37,7 +38,6 @@ defmodule Growbox.Application do
       {Growbox.SmallPump, [16, :ph_down_pump]},
       {Growbox.SmallPump, [26, :nutrient_pump]},
       {Growbox.WaterLevel, [27, 22]},
-      Growbox,
       Picam.Camera
     ])
   end
