@@ -12,8 +12,7 @@ defmodule Growbox.Application do
       [
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
-        GrowboxWeb.Endpoint,
-        Application.get_env(:picam, :camera, Picam.Camera)
+        GrowboxWeb.Endpoint
       ] ++ children(target())
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
@@ -25,6 +24,7 @@ defmodule Growbox.Application do
       # Children that only run on the host
       # Starts a worker by calling: Firmware.Worker.start_link(arg)
       # {Firmware.Worker, arg},
+      Picam.FakeCamera
     ]
   end
 
@@ -37,7 +37,8 @@ defmodule Growbox.Application do
       {Growbox.SmallPump, [16, :ph_down_pump]},
       {Growbox.SmallPump, [26, :nutrient_pump]},
       {Growbox.WaterLevel, [27, 22]},
-      Growbox
+      Growbox,
+      Picam.Camera
     ])
   end
 
