@@ -17,7 +17,8 @@ defmodule GrowboxWeb.Router do
   scope "/", GrowboxWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/", HomeLive, :index
+    live "/bla", HomeLive, :cam
   end
 
   # Other scopes may use custom stacks.

@@ -5,26 +5,58 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
-    <%= live_title_tag assigns[:page_title] || "Growbox", suffix: " · Phoenix Framework" %>
+    <%= live_title_tag assigns[:page_title] || "", suffix: "Growbox" %>
     <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
-  <body>
-    <header>
-      <section class="container">
-        <nav role="navigation">
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
-            <% end %>
-          </ul>
+
+  <body class="bg-gray-200">
+    <div class="flex flex-col min-h-screen">
+      <header class="bg-lime-300">
+        <nav class="container flex flex-wrap items-center justify-between max-w-screen-xl p-6 mx-auto">
+          <a href="/" class="flex items-center flex-shrink-0 mr-6 text-gray-800">
+            <%= img_tag(Routes.static_path(@conn, "/images/logo.svg"), class: "w-8 h-8") %>
+            <span class="ml-2 text-xl font-semibold tracking-tight leading-none">Growbox</span>
+          </a>
+
+          <button type="button" class="inline-flex items-center justify-center p-2 -mx-1 -my-2 text-black transition duration-150 ease-in-out rounded-md pointer lg:hidden hover:bg-lime-400 hover:black" id="open-main-menu" aria-label="Main menu" aria-haspopup="true">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
         </nav>
-        <a href="https://phoenixframework.org/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
-        </a>
-      </section>
-    </header>
-    <%= @inner_content %>
+      </header>
+
+      <div class="absolute inset-x-0 top-0 z-50 hidden p-6 m-3 space-y-6 rounded-md shadow-md bg-gray-50 lg:hidden" id="main-menu">
+        <nav class="flex items-center justify-between">
+          <a href="/" class="flex items-center flex-shrink-0 text-teal-500">
+            <%= img_tag(Routes.static_path(@conn, "/images/logo.svg"), class: "w-8 h-8") %>
+            <span class="ml-1 text-xl font-semibold tracking-tight">Growbox</span>
+          </a>
+
+          <button type="button" class="inline-flex items-center justify-center p-2 -m-2 text-black transition duration-150 ease-in-out rounded-md pointer hover:bg-lime-400 hover:text-black" id="close-main-menu">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </nav>
+
+        <div class="space-y-6">
+          <%= render "_nav.html", conn: assigns[:conn] || assigns[:socket], current_path: @current_path %>
+        </div>
+      </div>
+
+      <main role="main" class="flex flex-grow w-full max-w-screen-xl p-6 mx-auto space-y-6">
+        <div class="grid w-full grid-cols-1 lg:grid-cols-12 lg:gap-x-6 lg:space-y-0">
+          <aside class="flex-col justify-between flex-grow hidden space-y-6 lg:col-span-3 lg:flex">
+            <%= render "_nav.html", conn: assigns[:conn] || assigns[:socket], current_path: @current_path %>
+          </aside>
+
+          <main class="space-y-6 lg:col-span-9">
+            <%= @inner_content %>
+          </main>
+        </div>
+      </main>
+    </div>
   </body>
 </html>

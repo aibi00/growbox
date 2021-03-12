@@ -1,0 +1,8 @@
+<%= link @opts ++ [to: @to, class: "flex items-center px-3 py-2 text-sm font-medium rounded-md hover:text-gray-900 group #{if @current?, do: "bg-gray-50 text-lime-600 hover:bg-white", else: "text-gray-900 hover:bg-gray-100"}"] do %>
+  <span class="<%= if @current?, do: "text-lime-500", else: "text-gray-400" %>">
+    <%= @icon %>
+  </span>
+  <span class="truncate">
+    <%= @text %>
+  </span>
+<% end %>

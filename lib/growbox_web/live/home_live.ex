@@ -1,4 +1,4 @@
-defmodule GrowboxWeb.PageLive do
+defmodule GrowboxWeb.HomeLive do
   use GrowboxWeb, :live_view
 
   @impl true
@@ -12,6 +12,13 @@ defmodule GrowboxWeb.PageLive do
       |> assign(messages: [])
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(_params, url, socket) do
+    socket = socket |> assign(current_path: URI.parse(url).path)
+
+    {:noreply, socket}
   end
 
   @impl true

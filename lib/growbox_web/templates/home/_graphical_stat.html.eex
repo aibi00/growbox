@@ -1,0 +1,15 @@
+<a class="flex flex-col h-full bg-white rounded-lg shadow-md" href="/all">
+  <header class="flex-grow px-4 pt-4 text-sm font-bold tracking-widest text-left text-gray-600 uppercase">
+    Temperature
+  </header>
+
+  <main class="pt-1">
+    <svg class="w-full h-10 text-teal-200 fill-current stroke-1 stroke-teal-500" viewBox="0 0 100 100" preserveAspectRatio="none" role="img">
+
+      <path d="M 0 100 L 0 95 L 0 91 L 4 28 L 8 68 L 12 29 L 16 3 L 20 0 L 25 13 L 29 40 L 33 38 L 37 38 L 41 40 L 45 39 L 50 40 L 54 44 L 58 51 L 62 52 L 66 51 L 70 53 L 75 34 L 79 46 L 83 38 L 87 31 L 91 22 L 95 46 L 100 61 V 100 Z" stroke="none"></path>
+      <path d="M 0 91 L 4 28 L 8 68 L 12 29 L 16 3 L 20 0 L 25 13 L 29 40 L 33 38 L 37 38 L 41 40 L 45 39 L 50 40 L 54 44 L 58 51 L 62 52 L 66 51 L 70 53 L 75 34 L 79 46 L 83 38 L 87 31 L 91 22 L 95 46 L 100 61" fill="none" vector-effect="non-scaling-stroke" transform="translate(0, 1)"></path>
+    </svg>
+  </main>
+
+  <footer class="px-4 py-3 text-xs font-bold tracking-widest text-left text-teal-500 uppercase bg-teal-200 rounded-b-lg">Last 24 hours</footer>
+</a>
