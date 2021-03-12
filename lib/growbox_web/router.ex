@@ -18,8 +18,10 @@ defmodule GrowboxWeb.Router do
     pipe_through :browser
 
     live "/", HomeLive, :index
-    live "/bla", HomeLive, :cam
+    live "/video", VideoCameraLive, :index
   end
+
+  forward "/video.mjpg", GrowboxWeb.VideoCamera.Streamer
 
   # Other scopes may use custom stacks.
   # scope "/api", GrowboxWeb do

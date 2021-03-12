@@ -12,7 +12,8 @@ defmodule Growbox.Application do
       [
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
-        GrowboxWeb.Endpoint
+        GrowboxWeb.Endpoint,
+        Application.get_env(:picam, :camera, Picam.Camera)
       ] ++ children(target())
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]

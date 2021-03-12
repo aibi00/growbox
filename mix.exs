@@ -84,6 +84,7 @@ defmodule Growbox.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.15.0"},
       {:phoenix_pubsub, "~> 2.0"},
+      {:picam, "~> 0.4.0"},
       {:plug_cowboy, "~> 2.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"}
