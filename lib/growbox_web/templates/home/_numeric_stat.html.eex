@@ -1,4 +1,4 @@
-<a class="flex flex-col justify-between h-full bg-white rounded-lg shadow-md" href="/all">
+<a class="flex flex-col justify-between h-full bg-white rounded-lg shadow-md" href="/">
   <header class="px-4 pt-4 text-sm font-bold tracking-widest text-left text-gray-600 uppercase">
     Some Value
   </header>
