@@ -43,7 +43,7 @@ defmodule Growbox.Application do
   end
 
   def target() do
-    Application.get_env(:firmware, :target)
+    Application.get_env(:growbox, :target)
   end
 
   # Tell Phoenix to update the endpoint configuration
