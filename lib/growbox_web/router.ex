@@ -10,14 +10,20 @@ defmodule GrowboxWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
+  pipeline :requires_growbox_alive do
+    plug GrowboxWeb.SetupRedirect
   end
 
   scope "/", GrowboxWeb do
     pipe_through :browser
 
-    live "/", HomeLive, :index
+    live "/", SetupLive, :index
+  end
+
+  scope "/", GrowboxWeb do
+    pipe_through [:browser, :requires_growbox_alive]
+
+    live "/home", HomeLive, :index
     live "/video", VideoCameraLive, :index
   end
 

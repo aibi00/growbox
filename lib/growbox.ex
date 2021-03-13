@@ -21,6 +21,21 @@ defmodule Growbox do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
   end
 
+  def start(_) do
+    GenServer.start(__MODULE__, %Growbox{}, name: __MODULE__)
+  end
+
+  def stop() do
+    __MODULE__ |> Process.whereis() |> Process.exit(:kill)
+  end
+
+  def alive? do
+    case Process.whereis(__MODULE__) do
+      nil -> false
+      _ -> true
+    end
+  end
+
   # Public API
 
   def manual_on(component) do

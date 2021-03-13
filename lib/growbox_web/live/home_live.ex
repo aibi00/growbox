@@ -34,6 +34,12 @@ defmodule GrowboxWeb.HomeLive do
   end
 
   @impl true
+  def handle_event("stop", _params, socket) do
+    Growbox.stop()
+    {:noreply, redirect(socket, to: Routes.setup_path(socket, :index))}
+  end
+
+  @impl true
   def handle_info(%Growbox{} = message, socket) do
     socket =
       socket
