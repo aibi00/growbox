@@ -144,4 +144,58 @@ defmodule GrowboxTest do
                {:manual, :on}
     end
   end
+
+  describe "pump system" do
+    setup do
+      start_supervised!(Growbox)
+      :ok
+    end
+
+    test "on startup the big pump is in automatic mode and the small ones are off" do
+      assert %{
+               pump: {:automatic, :off},
+               nutrient_pump: :off,
+               ph_down_pump: :off,
+               ph_up_pump: :off,
+               water_pump: :off
+             } = :sys.get_state(Growbox)
+    end
+
+    test "when the big pump is manually working, smalls pumps are blocked" do
+      Growbox.manual_on(:pump)
+
+      assert %{
+               pump: {:manual, :on},
+               nutrient_pump: :blocked,
+               ph_down_pump: :blocked,
+               ph_up_pump: :blocked,
+               water_pump: :blocked
+             } = :sys.get_state(Growbox)
+    end
+
+    test "when the big pump is automatically on, smalls pumps are blocked" do
+      :sys.replace_state(Growbox, fn state -> %{state | counter: 901} end)
+      send(Growbox, {:automatic_on_or_off, :pump})
+
+      assert %{
+               pump: {:automatic, :on},
+               nutrient_pump: :blocked,
+               ph_down_pump: :blocked,
+               ph_up_pump: :blocked,
+               water_pump: :blocked
+             } = :sys.get_state(Growbox)
+    end
+
+    test "when the big pump is manually off, smalls pumps are blocked" do
+      Growbox.manual_off(:pump)
+
+      assert %{
+               pump: {:manual, :off},
+               nutrient_pump: :blocked,
+               ph_down_pump: :blocked,
+               ph_up_pump: :blocked,
+               water_pump: :blocked
+             } = :sys.get_state(Growbox)
+    end
+  end
 end

@@ -7,7 +7,7 @@ defmodule Growbox.SmallPumpTest do
     :ok
   end
 
-  test "receiving an on message" do
+  test "receives a on message" do
     {:ok, pid} = SmallPump.start_link(4, :water_pump)
     send(pid, %Growbox{water_pump: :on})
 
@@ -15,11 +15,27 @@ defmodule Growbox.SmallPumpTest do
     assert_receive {:write, [_ref, 1]}
   end
 
-  test "receiving an off message" do
+  test "receives a off message" do
     {:ok, pid} = SmallPump.start_link(4, :water_pump)
     send(pid, %Growbox{water_pump: :off})
 
     assert_receive {:open, [4, :output]}
     assert_receive {:write, [_ref, 0]}
+  end
+
+  test "receives a blocked message" do
+    {:ok, pid} = SmallPump.start_link(4, :water_pump)
+    send(pid, %Growbox{water_pump: :blocked})
+
+    assert_receive {:open, [4, :output]}
+    assert_receive {:write, [_ref, 0]}
+  end
+
+  test "ignores messages for other pump" do
+    {:ok, pid} = SmallPump.start_link(4, :water_pump)
+    send(pid, %Growbox{ph_down_pump: :on})
+
+    assert_receive {:open, [4, :output]}
+    refute_receive {:write, [_ref, 1]}
   end
 end

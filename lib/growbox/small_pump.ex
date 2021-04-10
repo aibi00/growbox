@@ -26,6 +26,7 @@ defmodule Growbox.SmallPump do
     case Map.fetch!(info, name) do
       :on -> on!(pin)
       :off -> off!(pin)
+      :blocked -> off!(pin)
     end
 
     {:noreply, {pin, name}}

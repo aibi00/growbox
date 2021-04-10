@@ -7,8 +7,10 @@ defmodule Growbox do
             brightness: 1,
             pump: {:automatic, :off},
             # 15 mins
+            # get time from website
             pump_off_time: 900,
             # 10 mins
+            # get time from website
             pump_on_time: 600,
             counter: 0,
             water_pump: :off,
@@ -103,6 +105,34 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_cast({:manual_on, :pump}, state) do
+    new_state = %{
+      state
+      | pump: {:manual, :on},
+        water_pump: :blocked,
+        ph_up_pump: :blocked,
+        ph_down_pump: :blocked,
+        nutrient_pump: :blocked
+    }
+
+    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:manual_off, :pump}, state) do
+    new_state = %{
+      state
+      | pump: {:manual, :off},
+        water_pump: :blocked,
+        ph_up_pump: :blocked,
+        ph_down_pump: :blocked,
+        nutrient_pump: :blocked
+    }
+
+    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   def handle_cast({:brightness, value}, state) do
     new_state = %{state | brightness: value}
     {:noreply, new_state, {:continue, :broadcast}}
@@ -136,21 +166,6 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
-    # counter % pump_on + pump_off
-    modulus = rem(state.counter, state.pump_off_time + state.pump_on_time)
-
-    if modulus < state.pump_off_time do
-      {:automatic, :off}
-    else
-      {:automatic, :on}
-    end
-  end
-
-  def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
-    state.pump
-  end
-
   def handle_info({:automatic_on_or_off, :lamp}, state) do
     new_state =
       case state.lamp do
@@ -178,18 +193,58 @@ defmodule Growbox do
     new_state = %{state | pump: {:automatic, :off}}
     new_state = %{new_state | pump: pump_cycle(new_state)}
 
+    new_state =
+      case new_state.pump do
+        {:automatic, :on} ->
+          %{
+            new_state
+            | water_pump: :blocked,
+              ph_up_pump: :blocked,
+              ph_down_pump: :blocked,
+              nutrient_pump: :blocked
+          }
+
+        {:automatic, :off} ->
+          %{
+            new_state
+            | water_pump: :off,
+              ph_up_pump: :off,
+              ph_down_pump: :off,
+              nutrient_pump: :off
+          }
+      end
+
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def handle_cast({:manual_on, :pump}, state) do
-    new_state = %{state | pump: {:manual, :on}}
-    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
-    {:noreply, new_state, {:continue, :broadcast}}
+  def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
+    # counter % pump_on + pump_off
+    modulus = rem(state.counter, state.pump_off_time + state.pump_on_time)
+
+    if modulus < state.pump_off_time do
+      {:automatic, :off}
+    else
+      {:automatic, :on}
+    end
   end
 
-  def handle_cast({:manual_off, :pump}, state) do
-    new_state = %{state | pump: {:manual, :off}}
-    Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
+  def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
+    state.pump
+  end
+
+  def handle_cast({:water_level, value}, state) do
+    new_state =
+      case value do
+        :enough ->
+          %{state | water_pump: :off}
+
+        :too_low ->
+          %{state | water_pump: :on}
+
+        :too_high ->
+          %{state | water_pump: :off}
+      end
+
     {:noreply, new_state, {:continue, :broadcast}}
   end
 end
