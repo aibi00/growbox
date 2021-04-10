@@ -52,9 +52,8 @@ defmodule Growbox.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:tzdata, "~> 1.0"},
-
       # Dependencies for all targets
+      {:tzdata, "~> 1.1"},
       {:nerves, "~> 1.7.4", runtime: false},
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
@@ -62,9 +61,7 @@ defmodule Growbox.MixProject do
 
       # Sensors and stuff
       {:circuits_gpio, "~> 0.4"},
-      {:pigpiox, "~> 0.1", targets: @all_targets},
-      # {:circuits_spi, "~> 0.1.5"},
-      # {:mcp3008, "~> 0.1.0"},
+      # {:pigpiox, "~> 0.1"},
       {:mcp300x, "~> 0.1.1"},
 
       # Dependencies for all targets except :host
@@ -99,7 +96,8 @@ defmodule Growbox.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"]
+      setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"],
+      burn: ["phx.digest", "firmware", "firmware.burn"]
     ]
   end
 end

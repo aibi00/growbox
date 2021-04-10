@@ -3,6 +3,8 @@ defmodule GrowboxTest do
 
   setup do
     Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
+    start_supervised!(Growbox)
+    :ok
   end
 
   describe "start_link/1" do
@@ -112,6 +114,36 @@ defmodule GrowboxTest do
     end
   end
 
+  describe "set_temperature/1" do
+    test "sets the temperature" do
+      lamp_state = :sys.get_state(Growbox).lamp
+      Growbox.set_temperature(65)
+      assert %{temperature: 65, lamp: ^lamp_state} = :sys.get_state(Growbox)
+    end
+
+    test "sets the temperature and turns off the lamp if too hot" do
+      Growbox.set_temperature(71)
+      assert %{temperature: 71, lamp: :too_hot} = :sys.get_state(Growbox)
+    end
+  end
+
+  describe "set_waterlevel/1" do
+    test "turns on water pump if :too_low" do
+      Growbox.set_water_level(:too_low)
+      assert %{water_pump: :on} = :sys.get_state(Growbox)
+    end
+
+    test "does nothing if :normal" do
+      Growbox.set_water_level(:normal)
+      assert %{water_pump: :off} = :sys.get_state(Growbox)
+    end
+
+    test "does nothing if :too_high" do
+      Growbox.set_water_level(:too_high)
+      assert %{water_pump: :off} = :sys.get_state(Growbox)
+    end
+  end
+
   describe "pump_cycle/1" do
     test "automatic mode" do
       default_state = %Growbox{
@@ -146,11 +178,6 @@ defmodule GrowboxTest do
   end
 
   describe "pump system" do
-    setup do
-      start_supervised!(Growbox)
-      :ok
-    end
-
     test "on startup the big pump is in automatic mode and the small ones are off" do
       assert %{
                pump: {:automatic, :off},

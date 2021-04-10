@@ -38,7 +38,11 @@ defmodule Growbox.Application do
       {Growbox.SmallPump, [26, :nutrient_pump]},
       {Growbox.WaterLevel, [27, 22]},
       Picam.Camera,
-      {MCP300X.Server, ["spidev0.0", MCP300X.MCP3008, name: Growbox.MCP3008]},
+      %{
+        id: MCP300X.Server,
+        start:
+          {MCP300X.Server, :start_link, ["spidev0.0", MCP300X.MCP3008, [name: Growbox.MCP3008]]}
+      },
       {Growbox.Temp, [5, 6, 7]}
     ])
   end

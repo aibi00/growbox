@@ -4,6 +4,7 @@ defmodule Growbox do
   @timezone "Europe/Vienna"
 
   defstruct lamp: {:automatic, :off},
+            temperature: 20,
             brightness: 1,
             pump: {:automatic, :off},
             # 15 mins
@@ -16,8 +17,7 @@ defmodule Growbox do
             water_pump: :off,
             ph_up_pump: :off,
             ph_down_pump: :off,
-            nutrient_pump: :off,
-            water_level: :enough
+            nutrient_pump: :off
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -62,6 +62,10 @@ defmodule Growbox do
 
   def set_water_level(value) do
     GenServer.cast(__MODULE__, {:water_level, value})
+  end
+
+  def set_temperature(value) do
+    GenServer.cast(__MODULE__, {:temperature, value})
   end
 
   # GenServer API
@@ -149,7 +153,29 @@ defmodule Growbox do
   end
 
   def handle_cast({:water_level, value}, state) do
-    new_state = %{state | water_level: value}
+    new_state =
+      case value do
+        :too_low ->
+          %{state | water_pump: :on}
+
+        :normal ->
+          %{state | water_pump: :off}
+
+        :too_high ->
+          %{state | water_pump: :off}
+      end
+
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:temperature, value}, state) do
+    new_state =
+      if value > 70 do
+        %{state | lamp: :too_hot, temperature: value}
+      else
+        %{state | temperature: value}
+      end
+
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
@@ -174,19 +200,6 @@ defmodule Growbox do
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
-  end
-
-  defp lamp_on_or_off() do
-    time =
-      Application.get_env(:growbox, :datetime, DateTime)
-      |> apply(:now!, [@timezone])
-      |> DateTime.to_time()
-
-    if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
-      :on
-    else
-      :off
-    end
   end
 
   def handle_info({:automatic_on_or_off, :pump}, state) do
@@ -217,6 +230,19 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  defp lamp_on_or_off() do
+    time =
+      Application.get_env(:growbox, :datetime, DateTime)
+      |> apply(:now!, [@timezone])
+      |> DateTime.to_time()
+
+    if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
+      :on
+    else
+      :off
+    end
+  end
+
   def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
     # counter % pump_on + pump_off
     modulus = rem(state.counter, state.pump_off_time + state.pump_on_time)
@@ -230,21 +256,5 @@ defmodule Growbox do
 
   def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
     state.pump
-  end
-
-  def handle_cast({:water_level, value}, state) do
-    new_state =
-      case value do
-        :enough ->
-          %{state | water_pump: :off}
-
-        :too_low ->
-          %{state | water_pump: :on}
-
-        :too_high ->
-          %{state | water_pump: :off}
-      end
-
-    {:noreply, new_state, {:continue, :broadcast}}
   end
 end

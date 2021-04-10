@@ -23,7 +23,7 @@ defmodule Growbox.WaterLevelTest do
     send(pid, :tick)
     :timer.sleep(5)
 
-    assert :sys.get_state(Growbox).water_level == :too_low
+    assert %{water_pump: :on} = :sys.get_state(Growbox)
   end
 
   test "reading only min high", %{max: max, min: min} do
@@ -35,7 +35,7 @@ defmodule Growbox.WaterLevelTest do
     send(pid, :tick)
     :timer.sleep(5)
 
-    assert :sys.get_state(Growbox).water_level == :enough
+    assert %{water_pump: :off} = :sys.get_state(Growbox)
   end
 
   @tag :capture_log
@@ -51,7 +51,6 @@ defmodule Growbox.WaterLevelTest do
 
     assert_receive {:EXIT, ^pid, {%RuntimeError{message: "impossibru"}, _}}
     assert Process.alive?(pid) == false
-    assert :sys.get_state(Growbox).water_level == :enough
   end
 
   test "reading both high", %{max: max, min: min} do
@@ -63,6 +62,6 @@ defmodule Growbox.WaterLevelTest do
     send(pid, :tick)
     :timer.sleep(5)
 
-    assert :sys.get_state(Growbox).water_level == :too_high
+    assert %{water_pump: :off} = :sys.get_state(Growbox)
   end
 end
