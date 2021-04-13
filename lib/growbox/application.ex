@@ -43,7 +43,9 @@ defmodule Growbox.Application do
         start:
           {MCP300X.Server, :start_link, ["spidev0.0", MCP300X.MCP3008, [name: Growbox.MCP3008]]}
       },
-      {Growbox.Temp, [5, 6, 7]}
+      {Growbox.Temp, [5, 6, 7]},
+      {Growbox.PH, 4},
+      {Growbox.EC, 3}
     ])
   end
 
