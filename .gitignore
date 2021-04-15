@@ -33,6 +33,9 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
+# Ignore databases
+*.db
+
 # Make life on Mac easier
 .DS_Store
 .vscode/launch.json

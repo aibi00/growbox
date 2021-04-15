@@ -3,24 +3,25 @@ defmodule Growbox do
 
   @timezone "Europe/Vienna"
 
-  defstruct lamp: {:automatic, :off},
-            temperature: 20,
-            water_level: :normal,
-            pump: {:automatic, :off},
-            counter: 0,
-            water_pump: :off,
-            ph_up_pump: :off,
-            ph_down_pump: :off,
-            ec_pump: :off,
-            ph: 7,
+  defstruct counter: 0,
             ec: 1.2,
-            # from website
-            min_ph: 5.8,
-            max_ph: 6.2,
+            ph: 7.0,
+            temperature: 20.0,
+            water_level: :normal,
+            # Components
+            ec_pump: :off,
+            lamp: {:automatic, :off},
+            ph_down_pump: :off,
+            ph_up_pump: :off,
+            pump: {:automatic, :off},
+            water_pump: :off,
+            # From website
+            brightness: 1.0,
             max_ec: 1.4,
-            pump_on_time: 600,
+            max_ph: 6.2,
+            min_ph: 5.8,
             pump_off_time: 900,
-            brightness: 1
+            pump_on_time: 600
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)

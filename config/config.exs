@@ -1,5 +1,8 @@
 import Config
 
+config :growbox, ecto_repos: [Growbox.Repo]
+config :growbox, Growbox.Repo, database: "#{Mix.env()}.db"
+
 # Enable the Nerves integration with Mix
 Application.start(:nerves_bootstrap)
 

@@ -10,6 +10,7 @@ defmodule Growbox.Application do
     # for other strategies and supported options
     children =
       [
+        Growbox.Repo,
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
         GrowboxWeb.Endpoint

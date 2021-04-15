@@ -1,5 +1,7 @@
 import Config
 
+config :growbox, Growbox.Repo, database: "/data/prod.db"
+
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information
 # when generating URLs.

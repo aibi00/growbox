@@ -5,6 +5,9 @@ config :growbox, :pwm, FakePwm
 config :growbox, :gpio, FakeGPIO
 config :growbox, :child_processes, []
 
+# Configure your database
+config :growbox, Growbox.Repo, pool: Ecto.Adapters.SQL.Sandbox
+
 # Phoenix configuration
 
 # We don't run a server during test. If one is required,
