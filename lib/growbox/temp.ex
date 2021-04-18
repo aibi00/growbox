@@ -28,7 +28,8 @@ defmodule Growbox.Temp do
         calc_temp(value)
       end
 
-    Growbox.set_temperature(Enum.max(temperatures))
+    send(Growbox, {:temperature, Enum.max(temperatures)})
+
     {:noreply, channels}
   end
 end

@@ -114,36 +114,6 @@ defmodule GrowboxTest do
     end
   end
 
-  describe "set_temperature/1" do
-    test "sets the temperature" do
-      lamp_state = :sys.get_state(Growbox).lamp
-      Growbox.set_temperature(65)
-      assert %{temperature: 65, lamp: ^lamp_state} = :sys.get_state(Growbox)
-    end
-
-    test "sets the temperature and turns off the lamp if too hot" do
-      Growbox.set_temperature(71)
-      assert %{temperature: 71, lamp: :too_hot} = :sys.get_state(Growbox)
-    end
-  end
-
-  describe "set_waterlevel/1" do
-    test "turns on water pump if :too_low" do
-      Growbox.set_water_level(:too_low)
-      assert %{water_pump: :on} = :sys.get_state(Growbox)
-    end
-
-    test "does nothing if :normal" do
-      Growbox.set_water_level(:normal)
-      assert %{water_pump: :off} = :sys.get_state(Growbox)
-    end
-
-    test "does nothing if :too_high" do
-      Growbox.set_water_level(:too_high)
-      assert %{water_pump: :off} = :sys.get_state(Growbox)
-    end
-  end
-
   describe "pump_cycle/1" do
     test "automatic mode" do
       default_state = %Growbox{
@@ -230,49 +200,53 @@ defmodule GrowboxTest do
     test "receiving high pH value" do
       send(Growbox, {:ph, 6.4})
 
-      assert %{
-               ph_down_pump: :on,
-               ph_up_pump: :off,
-               ph: 6.4
-             } = :sys.get_state(Growbox)
-    end
-
-    test "receiving low pH value" do
-      send(Growbox, {:ph, 5.6})
-
-      assert %{
-               ph_down_pump: :off,
-               ph_up_pump: :on,
-               ph: 5.6
-             } = :sys.get_state(Growbox)
+      assert %{ph_down_pump: :on, ph_up_pump: :off, ph: 6.4} = :sys.get_state(Growbox)
     end
 
     test "receiving normal pH value" do
       send(Growbox, {:ph, 6})
+      assert %{ph_down_pump: :off, ph_up_pump: :off, ph: 6} = :sys.get_state(Growbox)
+    end
 
-      assert %{
-               ph_down_pump: :off,
-               ph_up_pump: :off,
-               ph: 6
-             } = :sys.get_state(Growbox)
+    test "receiving low pH value" do
+      send(Growbox, {:ph, 5.6})
+      assert %{ph_down_pump: :off, ph_up_pump: :on, ph: 5.6} = :sys.get_state(Growbox)
     end
 
     test "receiving high ec value" do
       send(Growbox, {:ec, 1.6})
-
-      assert %{
-               ec_pump: :off,
-               ec: 1.6
-             } = :sys.get_state(Growbox)
+      assert %{ec_pump: :off, ec: 1.6} = :sys.get_state(Growbox)
     end
 
     test "receiving low ec value" do
       send(Growbox, {:ec, 1})
+      assert %{ec_pump: :on, ec: 1} = :sys.get_state(Growbox)
+    end
 
-      assert %{
-               ec_pump: :on,
-               ec: 1
-             } = :sys.get_state(Growbox)
+    test "receiving a high water level" do
+      send(Growbox, {:water_level, :too_high})
+      assert %{water_pump: :off} = :sys.get_state(Growbox)
+    end
+
+    test "receiving a normal water level" do
+      send(Growbox, {:water_level, :normal})
+      assert %{water_pump: :off} = :sys.get_state(Growbox)
+    end
+
+    test "receiving a low water level" do
+      send(Growbox, {:water_level, :too_low})
+      assert %{water_pump: :on} = :sys.get_state(Growbox)
+    end
+
+    test "receiving normal temperature" do
+      lamp_state = :sys.get_state(Growbox).lamp
+      send(Growbox, {:temperature, 65})
+      assert %{temperature: 65, lamp: ^lamp_state} = :sys.get_state(Growbox)
+    end
+
+    test "receiving high temperature" do
+      send(Growbox, {:temperature, 71})
+      assert %{temperature: 71, lamp: :too_hot} = :sys.get_state(Growbox)
     end
   end
 end

@@ -23,7 +23,8 @@ defmodule Growbox do
             # from website
             min_ph: 5.8,
             max_ph: 6.2,
-            max_ec: 1.4
+            max_ec: 1.4,
+            water_level: :normal
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -64,14 +65,6 @@ defmodule Growbox do
 
   def set_pump_on_time(value) do
     GenServer.cast(__MODULE__, {:pump_on_time, value})
-  end
-
-  def set_water_level(value) do
-    GenServer.cast(__MODULE__, {:water_level, value})
-  end
-
-  def set_temperature(value) do
-    GenServer.cast(__MODULE__, {:temperature, value})
   end
 
   # GenServer API
@@ -158,23 +151,23 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def handle_cast({:water_level, value}, state) do
+  def handle_info({:water_level, value}, state) do
     new_state =
       case value do
         :too_low ->
-          %{state | water_pump: :on}
+          %{state | water_pump: :on, water_level: value}
 
         :normal ->
-          %{state | water_pump: :off}
+          %{state | water_pump: :off, water_level: value}
 
         :too_high ->
-          %{state | water_pump: :off}
+          %{state | water_pump: :off, water_level: value}
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def handle_cast({:temperature, value}, state) do
+  def handle_info({:temperature, value}, state) do
     new_state =
       if value > 70 do
         %{state | lamp: :too_hot, temperature: value}

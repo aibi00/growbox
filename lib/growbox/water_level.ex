@@ -25,7 +25,7 @@ defmodule Growbox.WaterLevel do
         {1, 1} -> :too_high
       end
 
-    Growbox.set_water_level(water_level)
+    send(Growbox, {:water_level, water_level})
     {:noreply, {max, min}}
   end
 end
