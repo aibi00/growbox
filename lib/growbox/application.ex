@@ -35,7 +35,7 @@ defmodule Growbox.Application do
       {Growbox.SmallPump, [5, :water_pump]},
       {Growbox.SmallPump, [6, :ph_up_pump]},
       {Growbox.SmallPump, [16, :ph_down_pump]},
-      {Growbox.SmallPump, [26, :nutrient_pump]},
+      {Growbox.SmallPump, [26, :ec_pump]},
       {Growbox.WaterLevel, [27, 22]},
       Picam.Camera,
       %{
