@@ -17,7 +17,13 @@ defmodule Growbox do
             water_pump: :off,
             ph_up_pump: :off,
             ph_down_pump: :off,
-            nutrient_pump: :off
+            ec_pump: :off,
+            ph: 7,
+            ec: 1.2,
+            # from website
+            min_ph: 5.8,
+            max_ph: 6.2,
+            max_ec: 1.4
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -116,7 +122,7 @@ defmodule Growbox do
         water_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
-        nutrient_pump: :blocked
+        ec_pump: :blocked
     }
 
     Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
@@ -130,7 +136,7 @@ defmodule Growbox do
         water_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
-        nutrient_pump: :blocked
+        ec_pump: :blocked
     }
 
     Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
@@ -214,7 +220,7 @@ defmodule Growbox do
             | water_pump: :blocked,
               ph_up_pump: :blocked,
               ph_down_pump: :blocked,
-              nutrient_pump: :blocked
+              ec_pump: :blocked
           }
 
         {:automatic, :off} ->
@@ -223,12 +229,63 @@ defmodule Growbox do
             | water_pump: :off,
               ph_up_pump: :off,
               ph_down_pump: :off,
-              nutrient_pump: :off
+              ec_pump: :off
           }
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
   end
+
+  def handle_info({:ec, value}, state) do
+    new_state = %{state | ec: value}
+
+    new_state =
+      if(new_state.ec < state.max_ec) do
+        Process.send_after(self(), {:ec_pump, :off}, :timer.seconds(1))
+        %{new_state | ec_pump: :on}
+      else
+        new_state
+      end
+
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_info({:ph, value}, state) do
+    new_state = %{state | ph: value}
+
+    new_state =
+      cond do
+        new_state.ph >= state.max_ph ->
+          Process.send_after(self(), {:ph_down_pump, :off}, :timer.seconds(1))
+          %{new_state | ph_down_pump: :on}
+
+        new_state.ph <= state.min_ph ->
+          Process.send_after(self(), {:ph_up_pump, :off}, :timer.seconds(1))
+          %{new_state | ph_up_pump: :on}
+
+        true ->
+          new_state
+      end
+
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_info({:ph_down_pump, :off}, state) do
+    new_state = %{state | ph_down_pump: :off}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_info({:ph_up_pump, :off}, state) do
+    new_state = %{state | ph_up_pump: :off}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_info({:ec_pump, :off}, state) do
+    new_state = %{state | ec_pump: :off}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  # Helpers
 
   defp lamp_on_or_off() do
     time =

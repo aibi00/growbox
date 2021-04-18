@@ -17,7 +17,7 @@ defmodule Growbox.EC do
 
   def handle_info(:tick, channel) do
     {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
-    Growbox.set_ec(calc_ec(value))
+    send(Growbox, {:ec, calc_ec(value)})
     {:noreply, channel}
   end
 end

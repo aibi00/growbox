@@ -181,7 +181,7 @@ defmodule GrowboxTest do
     test "on startup the big pump is in automatic mode and the small ones are off" do
       assert %{
                pump: {:automatic, :off},
-               nutrient_pump: :off,
+               ec_pump: :off,
                ph_down_pump: :off,
                ph_up_pump: :off,
                water_pump: :off
@@ -193,7 +193,7 @@ defmodule GrowboxTest do
 
       assert %{
                pump: {:manual, :on},
-               nutrient_pump: :blocked,
+               ec_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
                water_pump: :blocked
@@ -206,7 +206,7 @@ defmodule GrowboxTest do
 
       assert %{
                pump: {:automatic, :on},
-               nutrient_pump: :blocked,
+               ec_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
                water_pump: :blocked
@@ -218,10 +218,60 @@ defmodule GrowboxTest do
 
       assert %{
                pump: {:manual, :off},
-               nutrient_pump: :blocked,
+               ec_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
                water_pump: :blocked
+             } = :sys.get_state(Growbox)
+    end
+  end
+
+  describe "sensor data" do
+    test "receiving high pH value" do
+      send(Growbox, {:ph, 6.4})
+
+      assert %{
+               ph_down_pump: :on,
+               ph_up_pump: :off,
+               ph: 6.4
+             } = :sys.get_state(Growbox)
+    end
+
+    test "receiving low pH value" do
+      send(Growbox, {:ph, 5.6})
+
+      assert %{
+               ph_down_pump: :off,
+               ph_up_pump: :on,
+               ph: 5.6
+             } = :sys.get_state(Growbox)
+    end
+
+    test "receiving normal pH value" do
+      send(Growbox, {:ph, 6})
+
+      assert %{
+               ph_down_pump: :off,
+               ph_up_pump: :off,
+               ph: 6
+             } = :sys.get_state(Growbox)
+    end
+
+    test "receiving high ec value" do
+      send(Growbox, {:ec, 1.6})
+
+      assert %{
+               ec_pump: :off,
+               ec: 1.6
+             } = :sys.get_state(Growbox)
+    end
+
+    test "receiving low ec value" do
+      send(Growbox, {:ec, 1})
+
+      assert %{
+               ec_pump: :on,
+               ec: 1
              } = :sys.get_state(Growbox)
     end
   end
