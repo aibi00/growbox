@@ -81,8 +81,8 @@ defmodule GrowboxTest do
     end
   end
 
-  describe "set_brightness/1" do
-    test "sets brightness" do
+  describe "set values from website" do
+    test "set_brightness/1" do
       Growbox.start_link([])
 
       Growbox.set_brightness(0)
@@ -94,23 +94,40 @@ defmodule GrowboxTest do
       Growbox.set_brightness(1)
       assert_receive %Growbox{brightness: 1}
     end
-  end
 
-  describe "set_pump_on_time/1" do
-    test "sets pump_on_time" do
+    test "set_pump_on_time/1" do
       Growbox.start_link([])
 
       Growbox.set_pump_on_time(9001)
       assert_receive %Growbox{pump_on_time: 9001}
     end
-  end
 
-  describe "set_pump_off_time/1" do
-    test "sets pump_off_time" do
+    test "set_pump_off_time/1" do
       Growbox.start_link([])
 
       Growbox.set_pump_off_time(9001)
       assert_receive %Growbox{pump_off_time: 9001}
+    end
+
+    test "set_max_ph/1" do
+      Growbox.start_link([])
+
+      Growbox.set_max_ph(9)
+      assert_receive %Growbox{max_ph: 9}
+    end
+
+    test "set_min_ph/1" do
+      Growbox.start_link([])
+
+      Growbox.set_min_ph(3)
+      assert_receive %Growbox{min_ph: 3}
+    end
+
+    test "set_max_ec/1" do
+      Growbox.start_link([])
+
+      Growbox.set_max_ec(2)
+      assert_receive %Growbox{max_ec: 2}
     end
   end
 

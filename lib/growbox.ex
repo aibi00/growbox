@@ -5,14 +5,8 @@ defmodule Growbox do
 
   defstruct lamp: {:automatic, :off},
             temperature: 20,
-            brightness: 1,
+            water_level: :normal,
             pump: {:automatic, :off},
-            # 15 mins
-            # get time from website
-            pump_off_time: 900,
-            # 10 mins
-            # get time from website
-            pump_on_time: 600,
             counter: 0,
             water_pump: :off,
             ph_up_pump: :off,
@@ -24,7 +18,9 @@ defmodule Growbox do
             min_ph: 5.8,
             max_ph: 6.2,
             max_ec: 1.4,
-            water_level: :normal
+            pump_on_time: 600,
+            pump_off_time: 900,
+            brightness: 1
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
@@ -65,6 +61,18 @@ defmodule Growbox do
 
   def set_pump_on_time(value) do
     GenServer.cast(__MODULE__, {:pump_on_time, value})
+  end
+
+  def set_max_ph(value) do
+    GenServer.cast(__MODULE__, {:max_ph, value})
+  end
+
+  def set_min_ph(value) do
+    GenServer.cast(__MODULE__, {:min_ph, value})
+  end
+
+  def set_max_ec(value) do
+    GenServer.cast(__MODULE__, {:max_ec, value})
   end
 
   # GenServer API
@@ -148,6 +156,21 @@ defmodule Growbox do
 
   def handle_cast({:pump_on_time, value}, state) do
     new_state = %{state | pump_on_time: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:max_ph, value}, state) do
+    new_state = %{state | max_ph: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:min_ph, value}, state) do
+    new_state = %{state | min_ph: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:max_ec, value}, state) do
+    new_state = %{state | max_ec: value}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
