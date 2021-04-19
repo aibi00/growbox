@@ -14,18 +14,21 @@ defmodule Growbox.WaterLevel do
   end
 
   def handle_info(:tick, {max, min}) do
-    max_value = Circuits.GPIO.read(max)
-    min_value = Circuits.GPIO.read(min)
+    if Growbox.alive?() do
+      max_value = Circuits.GPIO.read(max)
+      min_value = Circuits.GPIO.read(min)
 
-    water_level =
-      case {max_value, min_value} do
-        {0, 0} -> :too_low
-        {0, 1} -> :normal
-        {1, 0} -> raise "impossibru"
-        {1, 1} -> :too_high
-      end
+      water_level =
+        case {max_value, min_value} do
+          {0, 0} -> :too_low
+          {0, 1} -> :normal
+          {1, 0} -> raise "impossibru"
+          {1, 1} -> :too_high
+        end
 
-    send(Growbox, {:water_level, water_level})
+      send(Growbox, {:water_level, water_level})
+    end
+
     {:noreply, {max, min}}
   end
 end

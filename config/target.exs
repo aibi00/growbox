@@ -1,7 +1,7 @@
 import Config
 
 config :growbox, GrowboxWeb.Endpoint,
-  url: [host: "nerves.local", port: 80],
+  url: [host: "growbox.local", port: 80],
   http: [port: 80],
   check_origin: false,
   server: true,
@@ -81,7 +81,7 @@ config :mdns_lite,
   # "nerves.local" for convenience. If more than one Nerves device is on the
   # network, delete "nerves" from the list.
 
-  host: [:hostname, "nerves"],
+  host: [:hostname, "growbox"],
   ttl: 120,
 
   # Advertise the following services over mDNS.
@@ -97,6 +97,12 @@ config :mdns_lite,
       protocol: "sftp-ssh",
       transport: "tcp",
       port: 22
+    },
+    %{
+      name: "HTTP Server",
+      protocol: "http",
+      transport: "tcp",
+      port: 80
     },
     %{
       name: "Erlang Port Mapper Daemon",

@@ -16,8 +16,11 @@ defmodule Growbox.EC do
   end
 
   def handle_info(:tick, channel) do
-    {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
-    send(Growbox, {:ec, calc_ec(value)})
+    if Growbox.alive?() do
+      {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
+      send(Growbox, {:ec, calc_ec(value)})
+    end
+
     {:noreply, channel}
   end
 end

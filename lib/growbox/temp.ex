@@ -23,13 +23,15 @@ defmodule Growbox.Temp do
   end
 
   def handle_info(:tick, channels) do
-    temperatures =
-      for channel <- channels do
-        {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
-        calc_temp(value)
-      end
+    if Growbox.alive?() do
+      temperatures =
+        for channel <- channels do
+          {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
+          calc_temp(value)
+        end
 
-    send(Growbox, {:temperature, Enum.max(temperatures)})
+      send(Growbox, {:temperature, Enum.max(temperatures)})
+    end
 
     {:noreply, channels}
   end
