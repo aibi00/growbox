@@ -98,7 +98,7 @@ defmodule Growbox.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"],
-      burn: ["phx.digest", "firmware", "firmware.burn"],
+      burn: ["cmd npm run deploy --prefix assets", "phx.digest", "firmware", "firmware.burn"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
