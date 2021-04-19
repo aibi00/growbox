@@ -13,7 +13,8 @@ defmodule Growbox.Application do
         Growbox.Repo,
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
-        GrowboxWeb.Endpoint
+        GrowboxWeb.Endpoint,
+        Growbox.Logger
       ] ++ children(target())
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
@@ -31,6 +32,7 @@ defmodule Growbox.Application do
 
   def children(_target) do
     Application.get_env(:growbox, :child_processes, [
+      Task.child_spec(&Growbox.Migrator.migrate/0),
       {Growbox.Lamp, 18},
       {Growbox.Pump, 4},
       {Growbox.SmallPump, [5, :water_pump]},

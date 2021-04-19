@@ -35,6 +35,7 @@ npm-debug.log
 
 # Ignore databases
 *.db
+*.db-*
 
 # Make life on Mac easier
 .DS_Store
