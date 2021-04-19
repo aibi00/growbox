@@ -38,13 +38,13 @@ mix archive.install hex nerves_bootstrap
 
 ```sh
 export MIX_TARGET=rpi3
-mix deps.get
+mix setup
 ```
 
 - Flashing the Raspberry PI
 
 ```sh
-MIX_ENV=prod MIX_TARGET=rpi3 mix do firmware, firmware.burn
+MIX_ENV=prod MIX_TARGET=rpi3 mix burn
 ```
 
 ## Troubleshooting

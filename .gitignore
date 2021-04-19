@@ -39,3 +39,5 @@ npm-debug.log
 # Make life on Mac easier
 .DS_Store
 .vscode/launch.json
+
+!.gitkeep
