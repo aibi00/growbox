@@ -5,6 +5,7 @@ defmodule Growbox.Temp do
     GenServer.start_link(__MODULE__, channels)
   end
 
+  # not sure bout this
   @i 23.9 * :math.pow(10, -3)
   @r0 100
   @a 3.91 * :math.pow(10, -3)
