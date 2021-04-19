@@ -38,14 +38,12 @@ defmodule Growbox.Log do
       ph: state.ph,
       temperature: state.temperature,
       water_level: component_state_to_string(state.water_level),
-
       ec_pump: component_state_to_string(state.ec_pump),
       lamp: component_state_to_string(state.lamp),
       ph_down_pump: component_state_to_string(state.ph_down_pump),
       ph_up_pump: component_state_to_string(state.ph_up_pump),
       pump: component_state_to_string(state.pump),
       water_pump: component_state_to_string(state.water_pump),
-
       brightness: state.brightness,
       max_ec: state.max_ec,
       max_ph: state.max_ph,
