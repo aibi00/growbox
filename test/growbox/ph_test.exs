@@ -3,7 +3,7 @@ defmodule Growbox.PHTest do
   alias Growbox.PH
 
   describe "calc_ph/1" do
-    test "calculate ec value" do
+    test "calculates pH value" do
       assert PH.calc_ph(620) == 7
       assert PH.calc_ph(496) > 4
     end

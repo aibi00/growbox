@@ -7,7 +7,7 @@ defmodule Growbox.SmallPumpTest do
     :ok
   end
 
-  test "receives a on message" do
+  test "receives an on message" do
     {:ok, pid} = SmallPump.start_link(4, :water_pump)
     send(pid, %Growbox{water_pump: :on})
 
@@ -15,7 +15,7 @@ defmodule Growbox.SmallPumpTest do
     assert_receive {:write, [_ref, 1]}
   end
 
-  test "receives a off message" do
+  test "receives an off message" do
     {:ok, pid} = SmallPump.start_link(4, :water_pump)
     send(pid, %Growbox{water_pump: :off})
 
