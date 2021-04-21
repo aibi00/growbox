@@ -86,13 +86,34 @@ defmodule GrowboxTest do
       Growbox.start_link([])
 
       Growbox.set_brightness(0)
-      assert_receive %Growbox{brightness: 0}
+      assert_receive %Growbox{brightness: 0.0}
 
       Growbox.set_brightness(0.5)
       assert_receive %Growbox{brightness: 0.5}
 
       Growbox.set_brightness(1)
-      assert_receive %Growbox{brightness: 1}
+      assert_receive %Growbox{brightness: 1.0}
+    end
+
+    test "set_max_ph/1" do
+      Growbox.start_link([])
+
+      Growbox.set_max_ph(9)
+      assert_receive %Growbox{max_ph: 9.0}
+    end
+
+    test "set_min_ph/1" do
+      Growbox.start_link([])
+
+      Growbox.set_min_ph(3)
+      assert_receive %Growbox{min_ph: 3.0}
+    end
+
+    test "set_max_ec/1" do
+      Growbox.start_link([])
+
+      Growbox.set_max_ec(2)
+      assert_receive %Growbox{max_ec: 2.0}
     end
 
     test "set_pump_on_time/1" do
@@ -107,27 +128,6 @@ defmodule GrowboxTest do
 
       Growbox.set_pump_off_time(9001)
       assert_receive %Growbox{pump_off_time: 9001}
-    end
-
-    test "set_max_ph/1" do
-      Growbox.start_link([])
-
-      Growbox.set_max_ph(9)
-      assert_receive %Growbox{max_ph: 9}
-    end
-
-    test "set_min_ph/1" do
-      Growbox.start_link([])
-
-      Growbox.set_min_ph(3)
-      assert_receive %Growbox{min_ph: 3}
-    end
-
-    test "set_max_ec/1" do
-      Growbox.start_link([])
-
-      Growbox.set_max_ec(2)
-      assert_receive %Growbox{max_ec: 2}
     end
   end
 
@@ -222,7 +222,7 @@ defmodule GrowboxTest do
 
     test "receiving normal pH value" do
       send(Growbox, {:ph, 6})
-      assert %{ph_down_pump: :off, ph_up_pump: :off, ph: 6} = :sys.get_state(Growbox)
+      assert %{ph_down_pump: :off, ph_up_pump: :off, ph: 6.0} = :sys.get_state(Growbox)
     end
 
     test "receiving low pH value" do
@@ -237,7 +237,7 @@ defmodule GrowboxTest do
 
     test "receiving low ec value" do
       send(Growbox, {:ec, 1})
-      assert %{ec_pump: :on, ec: 1} = :sys.get_state(Growbox)
+      assert %{ec_pump: :on, ec: 1.0} = :sys.get_state(Growbox)
     end
 
     test "receiving a high water level" do
@@ -258,12 +258,12 @@ defmodule GrowboxTest do
     test "receiving normal temperature" do
       lamp_state = :sys.get_state(Growbox).lamp
       send(Growbox, {:temperature, 65})
-      assert %{temperature: 65, lamp: ^lamp_state} = :sys.get_state(Growbox)
+      assert %{temperature: 65.0, lamp: ^lamp_state} = :sys.get_state(Growbox)
     end
 
     test "receiving high temperature" do
       send(Growbox, {:temperature, 71})
-      assert %{temperature: 71, lamp: :too_hot} = :sys.get_state(Growbox)
+      assert %{temperature: 71.0, lamp: :too_hot} = :sys.get_state(Growbox)
     end
   end
 end

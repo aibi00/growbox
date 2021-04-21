@@ -146,7 +146,22 @@ defmodule Growbox do
   end
 
   def handle_cast({:brightness, value}, state) do
-    new_state = %{state | brightness: value}
+    new_state = %{state | brightness: to_float(value)}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:max_ph, value}, state) do
+    new_state = %{state | max_ph: to_float(value)}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:min_ph, value}, state) do
+    new_state = %{state | min_ph: to_float(value)}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:max_ec, value}, state) do
+    new_state = %{state | max_ec: to_float(value)}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
@@ -157,21 +172,6 @@ defmodule Growbox do
 
   def handle_cast({:pump_on_time, value}, state) do
     new_state = %{state | pump_on_time: value}
-    {:noreply, new_state, {:continue, :broadcast}}
-  end
-
-  def handle_cast({:max_ph, value}, state) do
-    new_state = %{state | max_ph: value}
-    {:noreply, new_state, {:continue, :broadcast}}
-  end
-
-  def handle_cast({:min_ph, value}, state) do
-    new_state = %{state | min_ph: value}
-    {:noreply, new_state, {:continue, :broadcast}}
-  end
-
-  def handle_cast({:max_ec, value}, state) do
-    new_state = %{state | max_ec: value}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
@@ -192,11 +192,13 @@ defmodule Growbox do
   end
 
   def handle_info({:temperature, value}, state) do
+    new_state = %{state | temperature: to_float(value)}
+
     new_state =
       if value > 70 do
-        %{state | lamp: :too_hot, temperature: value}
+        %{new_state | lamp: :too_hot}
       else
-        %{state | temperature: value}
+        new_state
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
@@ -254,10 +256,10 @@ defmodule Growbox do
   end
 
   def handle_info({:ec, value}, state) do
-    new_state = %{state | ec: value}
+    new_state = %{state | ec: to_float(value)}
 
     new_state =
-      if(new_state.ec < state.max_ec) do
+      if new_state.ec < state.max_ec do
         Process.send_after(self(), {:ec_pump, :off}, :timer.seconds(1))
         %{new_state | ec_pump: :on}
       else
@@ -268,7 +270,7 @@ defmodule Growbox do
   end
 
   def handle_info({:ph, value}, state) do
-    new_state = %{state | ph: value}
+    new_state = %{state | ph: to_float(value)}
 
     new_state =
       cond do
@@ -331,4 +333,6 @@ defmodule Growbox do
   def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
     state.pump
   end
+
+  defp to_float(value), do: value / 1
 end
