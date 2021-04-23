@@ -6,7 +6,7 @@ defmodule Growbox.Temp do
   end
 
   # not sure bout this
-  @i 23.9 * :math.pow(10, -3)
+  @i 22.04 * :math.pow(10, -3)
   @r0 100
   @a 3.91 * :math.pow(10, -3)
 
