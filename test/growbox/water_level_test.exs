@@ -3,13 +3,11 @@ defmodule Growbox.WaterLevelTest do
   alias Growbox.WaterLevel
 
   setup do
-    {:ok, _pid} = FakeDateTime.start_link(~U[2020-01-01 12:00:00.0Z])
-
     # https://github.com/elixir-circuits/circuits_gpio#testing
     {:ok, max} = Circuits.GPIO.open(0, :output)
     {:ok, min} = Circuits.GPIO.open(2, :output)
 
-    {:ok, _pid} = Growbox.start_link([])
+    {:ok, _pid} = Growbox.start_link(now: DateTime.to_unix(~U[2020-01-01 12:00:00.0Z]))
 
     {:ok, max: max, min: min}
   end

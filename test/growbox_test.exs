@@ -1,9 +1,14 @@
 defmodule GrowboxTest do
   use ExUnit.Case
 
-  setup do
+  setup env do
     Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
-    start_supervised!(Growbox)
+
+    case env do
+      %{datetime: datetime} -> start_supervised!({Growbox, now: DateTime.to_unix(datetime)})
+      _ -> start_supervised!(Growbox)
+    end
+
     :ok
   end
 
@@ -12,17 +17,13 @@ defmodule GrowboxTest do
       assert_receive %Growbox{}
     end
 
+    @tag datetime: ~U[2020-01-01 12:00:00.0Z]
     test "switches lamp automatically on during the day" do
-      {:ok, _pid} = FakeDateTime.start_link(~U[2020-01-01 12:00:00.0Z])
-
-      :timer.sleep(5)
       assert_receive %Growbox{lamp: {:automatic, :on}}
     end
 
+    @tag datetime: ~U[2020-01-01 00:00:00.0Z]
     test "does nothing with the lamp during the night" do
-      {:ok, _pid} = FakeDateTime.start_link(~U[2020-01-01 00:00:00.0Z])
-
-      :timer.sleep(5)
       assert_receive %Growbox{lamp: {:automatic, :off}}
     end
   end
@@ -119,11 +120,11 @@ defmodule GrowboxTest do
         pump_on_time: 10
       }
 
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) == {:automatic, :off}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 14}) == {:automatic, :off}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 15}) == {:automatic, :on}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 24}) == {:automatic, :on}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 25}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 0}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 14}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 15}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 24}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 25}) == {:automatic, :off}
     end
 
     test "manual mode" do
@@ -133,13 +134,13 @@ defmodule GrowboxTest do
         pump_on_time: 10
       }
 
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 0}) ==
                {:manual, :off}
 
-      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 0}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, unixtime: 0}) ==
                {:manual, :on}
 
-      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 15}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, unixtime: 15}) ==
                {:manual, :on}
     end
   end
@@ -168,7 +169,7 @@ defmodule GrowboxTest do
     end
 
     test "when the big pump is automatically working, smalls pumps are blocked" do
-      :sys.replace_state(Growbox, fn state -> %{state | counter: 901} end)
+      :sys.replace_state(Growbox, fn state -> %{state | unixtime: 901} end)
       send(Growbox, {:automatic_on_or_off, :pump})
 
       assert %{

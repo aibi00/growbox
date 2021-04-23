@@ -1,9 +1,7 @@
 defmodule Growbox do
   use GenServer
 
-  @timezone "Europe/Vienna"
-
-  defstruct counter: 0,
+  defstruct unixtime: 0,
             ec: 1.2,
             ph: 7.0,
             temperature: 20.0,
@@ -23,12 +21,9 @@ defmodule Growbox do
             pump_off_time: 900,
             pump_on_time: 600
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %Growbox{}, name: __MODULE__)
-  end
-
-  def start(_) do
-    GenServer.start(__MODULE__, %Growbox{}, name: __MODULE__)
+  def start_link(opts \\ []) do
+    {now, _opts} = Keyword.pop(opts, :now, System.os_time(:second))
+    GenServer.start_link(__MODULE__, %Growbox{unixtime: now}, name: __MODULE__)
   end
 
   def stop() do
@@ -79,8 +74,8 @@ defmodule Growbox do
   # GenServer API
 
   def init(state) do
+    :timer.send_interval(:timer.seconds(1), :tick)
     Process.send_after(self(), {:automatic_on_or_off, :lamp}, 0)
-    Process.send_after(self(), :tick, :timer.seconds(1))
     {:ok, state, {:continue, :broadcast}}
   end
 
@@ -205,22 +200,16 @@ defmodule Growbox do
   end
 
   def handle_info(:tick, state) do
-    new_state =
-      case state.pump do
-        {:automatic, _} -> %{state | counter: state.counter + 1}
-        {_, _} -> state
-      end
-
+    new_state = %{state | unixtime: System.os_time(:second)}
     new_state = %{new_state | pump: pump_cycle(new_state)}
 
-    Process.send_after(self(), :tick, :timer.seconds(1))
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
   def handle_info({:automatic_on_or_off, :lamp}, state) do
     new_state =
       case state.lamp do
-        {_, _} -> %{state | lamp: {:automatic, lamp_on_or_off()}}
+        {_, _} -> %{state | lamp: {:automatic, lamp_on_or_off(state)}}
         :too_hot -> state
       end
 
@@ -306,10 +295,10 @@ defmodule Growbox do
 
   # Helpers
 
-  defp lamp_on_or_off() do
+  defp lamp_on_or_off(state) do
     time =
-      Application.get_env(:growbox, :datetime, DateTime)
-      |> apply(:now!, [@timezone])
+      state.unixtime
+      |> DateTime.from_unix!()
       |> DateTime.to_time()
 
     if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
@@ -320,8 +309,8 @@ defmodule Growbox do
   end
 
   def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
-    # counter % pump_on + pump_off
-    modulus = rem(state.counter, state.pump_off_time + state.pump_on_time)
+    # unixtime % pump_on + pump_off
+    modulus = rem(state.unixtime, state.pump_off_time + state.pump_on_time)
 
     if modulus < state.pump_off_time do
       {:automatic, :off}
