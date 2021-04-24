@@ -15,8 +15,9 @@ defmodule Growbox.Pump do
 
   def handle_info(%Growbox{} = info, pin) do
     case info.pump do
-      {_, :on} -> on!(pin)
-      {_, :off} -> off!(pin)
+      :automatic_on -> on!(pin)
+      :manual_on -> on!(pin)
+      _ -> off!(pin)
     end
 
     {:noreply, pin}

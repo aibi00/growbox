@@ -8,10 +8,10 @@ defmodule Growbox do
             water_level: :normal,
             # Components
             ec_pump: :off,
-            lamp: {:automatic, :off},
+            lamp: :automatic_off,
             ph_down_pump: :off,
             ph_up_pump: :off,
-            pump: {:automatic, :off},
+            pump: :automatic_off,
             water_pump: :off,
             # From website
             brightness: 1.0,
@@ -87,12 +87,12 @@ defmodule Growbox do
   def handle_cast({:manual_on, :lamp}, state) do
     new_state =
       case state.lamp do
-        {_, _} ->
-          Process.send_after(self(), {:automatic_on_or_off, :lamp}, :timer.minutes(10))
-          %{state | lamp: {:manual, :on}}
-
         :too_hot ->
           state
+
+        _ ->
+          Process.send_after(self(), {:automatic_on_or_off, :lamp}, :timer.minutes(10))
+          %{state | lamp: :manual_on}
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
@@ -101,12 +101,12 @@ defmodule Growbox do
   def handle_cast({:manual_off, :lamp}, state) do
     new_state =
       case state.lamp do
-        {_, _} ->
-          Process.send_after(self(), {:automatic_on_or_off, :lamp}, :timer.minutes(10))
-          %{state | lamp: {:manual, :off}}
-
         :too_hot ->
           state
+
+        _ ->
+          Process.send_after(self(), {:automatic_on_or_off, :lamp}, :timer.minutes(10))
+          %{state | lamp: :manual_off}
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
@@ -115,7 +115,7 @@ defmodule Growbox do
   def handle_cast({:manual_on, :pump}, state) do
     new_state = %{
       state
-      | pump: {:manual, :on},
+      | pump: :manual_on,
         water_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
@@ -129,7 +129,7 @@ defmodule Growbox do
   def handle_cast({:manual_off, :pump}, state) do
     new_state = %{
       state
-      | pump: {:manual, :off},
+      | pump: :manual_off,
         water_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
@@ -201,7 +201,7 @@ defmodule Growbox do
 
   def handle_info(:tick, state) do
     new_state = %{state | unixtime: System.os_time(:second)}
-    new_state = %{new_state | pump: pump_cycle(new_state)}
+    new_state = %{new_state | pump: calc_pump_state(new_state)}
 
     {:noreply, new_state, {:continue, :broadcast}}
   end
@@ -209,20 +209,20 @@ defmodule Growbox do
   def handle_info({:automatic_on_or_off, :lamp}, state) do
     new_state =
       case state.lamp do
-        {_, _} -> %{state | lamp: {:automatic, lamp_on_or_off(state)}}
         :too_hot -> state
+        _ -> %{state | lamp: calc_lamp_state(state)}
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
   def handle_info({:automatic_on_or_off, :pump}, state) do
-    new_state = %{state | pump: {:automatic, :off}}
-    new_state = %{new_state | pump: pump_cycle(new_state)}
+    new_state = %{state | pump: :automatic_off}
+    new_state = %{new_state | pump: calc_pump_state(new_state)}
 
     new_state =
       case new_state.pump do
-        {:automatic, :on} ->
+        :automatic_on ->
           %{
             new_state
             | water_pump: :blocked,
@@ -231,7 +231,7 @@ defmodule Growbox do
               ec_pump: :blocked
           }
 
-        {:automatic, :off} ->
+        :automatic_off ->
           %{
             new_state
             | water_pump: :off,
@@ -295,31 +295,40 @@ defmodule Growbox do
 
   # Helpers
 
-  defp lamp_on_or_off(state) do
+  defp calc_lamp_state(state) do
     time =
       state.unixtime
       |> DateTime.from_unix!()
       |> DateTime.to_time()
 
-    if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
-      :on
-    else
-      :off
+    new_automatic_lamp_state =
+      if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
+        :automatic_on
+      else
+        :automatic_off
+      end
+
+    case state.lamp do
+      :automatic_on -> new_automatic_lamp_state
+      :automatic_off -> new_automatic_lamp_state
+      _ -> state.lamp
     end
   end
 
-  def pump_cycle(%Growbox{pump: {:automatic, _}} = state) do
+  def calc_pump_state(%Growbox{pump: pump_state} = state)
+      when pump_state in [:automatic_on, :automatic_off] do
     # unixtime % pump_on + pump_off
     modulus = rem(state.unixtime, state.pump_off_time + state.pump_on_time)
 
     if modulus < state.pump_off_time do
-      {:automatic, :off}
+      :automatic_off
     else
-      {:automatic, :on}
+      :automatic_on
     end
   end
 
-  def pump_cycle(%Growbox{pump: {:manual, _}} = state) do
+  def calc_pump_state(%Growbox{pump: pump_state} = state)
+      when pump_state in [:manual_on, :manual_off] do
     state.pump
   end
 

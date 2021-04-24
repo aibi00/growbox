@@ -21,7 +21,8 @@ defmodule Growbox.Lamp do
 
     value =
       case info.lamp do
-        {_, :on} -> round(brightness * 1_000_000)
+        :automatic_on -> round(brightness * 1_000_000)
+        :manual_on -> round(brightness * 1_000_000)
         _ -> 0
       end
 

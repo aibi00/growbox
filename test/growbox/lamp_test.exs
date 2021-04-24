@@ -9,14 +9,14 @@ defmodule Growbox.LampTest do
 
   test "receives a on message" do
     {:ok, pid} = Lamp.start_link(18)
-    send(pid, %Growbox{lamp: {:automatic, :on}})
+    send(pid, %Growbox{lamp: :automatic_on})
 
     assert_receive {:hardware_pwm, [18, 800, 1_000_000]}
   end
 
   test "receives a off message" do
     {:ok, pid} = Lamp.start_link(18)
-    send(pid, %Growbox{lamp: {:manual, :off}})
+    send(pid, %Growbox{lamp: :manual_off})
 
     assert_receive {:hardware_pwm, [18, 800, 0]}
   end
@@ -30,7 +30,7 @@ defmodule Growbox.LampTest do
 
   test "sets brightness to a proper value" do
     {:ok, pid} = Lamp.start_link(18)
-    send(pid, %Growbox{lamp: {:manual, :on}, brightness: 0.3})
+    send(pid, %Growbox{lamp: :manual_on, brightness: 0.3})
 
     assert_receive {:hardware_pwm, [18, 800, 300_000]}
   end

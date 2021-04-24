@@ -9,7 +9,7 @@ defmodule Growbox.PumpTest do
 
   test "receives an on message" do
     {:ok, pid} = Pump.start_link(4)
-    send(pid, %Growbox{pump: {:automatic, :on}})
+    send(pid, %Growbox{pump: :automatic_on})
 
     assert_receive {:open, [4, :output]}
     assert_receive {:write, [_ref, 1]}
@@ -17,7 +17,7 @@ defmodule Growbox.PumpTest do
 
   test "receives an off message" do
     {:ok, pid} = Pump.start_link(4)
-    send(pid, %Growbox{pump: {:automatic, :off}})
+    send(pid, %Growbox{pump: :automatic_off})
 
     assert_receive {:open, [4, :output]}
     assert_receive {:write, [_ref, 0]}
