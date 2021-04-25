@@ -33,8 +33,8 @@ defmodule Growbox.Application do
   def children(_target) do
     Application.get_env(:growbox, :child_processes, [
       Task.child_spec(&Growbox.Migrator.migrate/0),
-      {Growbox.Lamp, 12},
-      {Growbox.Pump, 4},
+      {Growbox.Lamp, 18},
+      {Growbox.Pump, 17},
       {Growbox.SmallPump, [5, :water_pump]},
       {Growbox.SmallPump, [6, :ph_up_pump]},
       {Growbox.SmallPump, [16, :ph_down_pump]},
