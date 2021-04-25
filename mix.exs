@@ -73,6 +73,7 @@ defmodule Growbox.MixProject do
       {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
 
       # Phoenix dependencies
+      {:nimble_csv, "~> 1.0"},
       {:floki, ">= 0.27.0", only: :test},
       {:jason, "~> 1.0"},
       {:phoenix, "~> 1.5.8"},
