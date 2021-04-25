@@ -17,8 +17,8 @@ defmodule Growbox.PH do
 
   def handle_info(:tick, channel) do
     if Growbox.alive?() do
-      ph = calc_ph(MCP300X.Server.read_channel(Growbox.MCP3008, channel))
-      send(Growbox, {:ph, ph})
+      {:ok, value} = MCP300X.Server.read_channel(Growbox.MCP3008, channel)
+      send(Growbox, {:ph, calc_ph(value)})
     end
 
     {:noreply, channel}
