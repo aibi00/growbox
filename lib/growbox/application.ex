@@ -12,7 +12,8 @@ defmodule Growbox.Application do
       [
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
-        GrowboxWeb.Endpoint
+        GrowboxWeb.Endpoint,
+        Growbox.Database
       ] ++ children(target())
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
