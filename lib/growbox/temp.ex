@@ -33,6 +33,8 @@ defmodule Growbox.Temp do
       send(Growbox, {:temperature, Enum.max(temperatures)})
     end
 
+    Process.send_after(self(), :tick, :timer.seconds(1))
+
     {:noreply, channels}
   end
 end

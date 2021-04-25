@@ -29,6 +29,8 @@ defmodule Growbox.WaterLevel do
       send(Growbox, {:water_level, water_level})
     end
 
+    Process.send_after(self(), :tick, :timer.seconds(1))
+
     {:noreply, {max, min}}
   end
 end

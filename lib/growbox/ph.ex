@@ -21,6 +21,8 @@ defmodule Growbox.PH do
       send(Growbox, {:ph, calc_ph(value)})
     end
 
+    Process.send_after(self(), :tick, :timer.seconds(60))
+
     {:noreply, channel}
   end
 end

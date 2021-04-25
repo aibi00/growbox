@@ -21,6 +21,8 @@ defmodule Growbox.EC do
       send(Growbox, {:ec, calc_ec(value)})
     end
 
+    Process.send_after(self(), :tick, :timer.seconds(1))
+
     {:noreply, channel}
   end
 end
