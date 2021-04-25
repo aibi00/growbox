@@ -24,6 +24,7 @@ defmodule GrowboxWeb.Router do
     pipe_through [:browser, :requires_growbox_alive]
 
     live "/home", HomeLive, :index
+    live "/log", LogLive, :index
     live "/video", VideoCameraLive, :index
   end
 

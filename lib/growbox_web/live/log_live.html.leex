@@ -1,0 +1,18 @@
+<h1 class="text-3xl font-bold leading-tight text-gray-900">
+  Log (showing last 25 messages)
+</h1>
+
+<div class="px-5 my-5 bg-white divide-gray-200 rounded-md divide-y divide-solid">
+  <%= case @messages do %>
+  <% [] -> %>
+    <p class="py-5">
+      Loading…
+    </p>
+  <% messages -> %>
+    <%= for message <- messages |> Enum.take(25) do %>
+      <p class="py-5">
+        <code><%= inspect message %></code>
+      </p>
+    <% end %>
+  <% end %>
+</div>
