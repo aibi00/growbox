@@ -23,11 +23,25 @@ defmodule Growbox do
 
   def start_link(opts \\ []) do
     {now, _opts} = Keyword.pop(opts, :now, System.os_time(:second))
-    GenServer.start_link(__MODULE__, %Growbox{unixtime: now}, name: __MODULE__)
-  end
 
-  def stop() do
-    __MODULE__ |> Process.whereis() |> Process.exit(:kill)
+    {max_ec, _opts} = Keyword.pop(opts, :max_ec, %__MODULE__{}.max_ec)
+    {max_ph, _opts} = Keyword.pop(opts, :max_ph, %__MODULE__{}.max_ph)
+    {min_ph, _opts} = Keyword.pop(opts, :min_ph, %__MODULE__{}.min_ph)
+    {pump_off_time, _opts} = Keyword.pop(opts, :pump_off_time, %__MODULE__{}.pump_off_time)
+    {pump_on_time, _opts} = Keyword.pop(opts, :pump_on_time, %__MODULE__{}.pump_on_time)
+
+    GenServer.start_link(
+      __MODULE__,
+      %Growbox{
+        unixtime: now,
+        max_ec: max_ec,
+        max_ph: max_ph,
+        min_ph: min_ph,
+        pump_off_time: pump_off_time,
+        pump_on_time: pump_on_time
+      },
+      name: __MODULE__
+    )
   end
 
   def alive? do

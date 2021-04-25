@@ -18,5 +18,8 @@ module.exports = {
         lime: colors.lime
       }
     }
-  }
+  },
+  plugins: [
+    require('@tailwindcss/forms')
+  ]
 }

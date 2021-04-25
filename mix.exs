@@ -77,6 +77,7 @@ defmodule Growbox.MixProject do
       {:floki, ">= 0.27.0", only: :test},
       {:jason, "~> 1.0"},
       {:phoenix, "~> 1.5.8"},
+      {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.14"},
       {:phoenix_live_dashboard, "~> 0.4"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

@@ -1,8 +1,44 @@
-Setup
+<h1 class="text-3xl font-bold leading-tight text-gray-900">
+  Setup
+</h1>
 
+<div class="my-5">
+  <%= f = form_for @changeset, "#", [phx_submit: :start] %>
+  <div class="shadow overflow-hidden sm:rounded-md">
+    <div class="px-4 py-5 bg-white sm:p-6">
+      <div class="grid grid-cols-6 gap-6">
+        <div class="row-start-1 col-span-6 sm:col-span-3">
+          <%= label f, :max_ec, "Max EC", class: "block text-sm font-medium text-gray-700" %>
+          <%= number_input f, :max_ec, step: 0.1, class: "mt-1 focus:ring-lime-500 focus:border-lime-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+        </div>
 
+        <div class="row-start-2 col-span-6 sm:col-span-3">
+          <%= label f, :min_ph, "Min pH", class: "block text-sm font-medium text-gray-700" %>
+          <%= number_input f, :min_ph, step: 0.1, class: "mt-1 focus:ring-lime-500 focus:border-lime-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+        </div>
 
+        <div class="row-start-2 col-span-6 sm:col-span-3">
+          <%= label f, :max_ph, "Max pH", class: "block text-sm font-medium text-gray-700" %>
+          <%= number_input f, :max_ph, step: 0.1, class: "mt-1 focus:ring-lime-500 focus:border-lime-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+        </div>
 
-<button class="px-4 py-2 font-medium leading-tight text-white bg-lime-500 border border-lime-500 rounded shadow whitespace-nowrap hover:border-lime-600 hover:bg-lime-600 focus:outline-none focus:ring focus:ring-lime-600 focus:border-lime-600" phx-click="start">
-  Wachstum starten
-</button>
+        <div class="row-start-3 col-span-6 sm:col-span-3">
+          <%= label f, :pump_off_time, "Offtime Pump", class: "block text-sm font-medium text-gray-700" %>
+          <%= number_input f, :pump_off_time, class: "mt-1 focus:ring-lime-500 focus:border-lime-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+        </div>
+
+        <div class="row-start-3 col-span-6 sm:col-span-3">
+          <%= label f, :pump_on_time, "Ontime Pump", class: "block text-sm font-medium text-gray-700" %>
+          <%= number_input f, :pump_on_time, class: "mt-1 focus:ring-lime-500 focus:border-lime-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+      <button class="px-4 py-2 font-medium leading-tight text-white bg-lime-500 border border-lime-500 rounded shadow whitespace-nowrap hover:border-lime-600 hover:bg-lime-600 focus:outline-none focus:ring focus:ring-lime-600 focus:border-lime-600" phx-click="start">
+        Wachstum starten
+      </button>
+    </div>
+  </div>
+</form>
+</div>
