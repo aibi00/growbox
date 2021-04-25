@@ -13,7 +13,7 @@
   <body class="bg-gray-200">
     <div class="flex flex-col min-h-screen">
       <header class="bg-lime-300">
-        <nav class="container flex flex-wrap items-center justify-between max-w-screen-xl p-6 mx-auto">
+        <nav class="container flex flex-wrap items-center justify-between max-w-screen-2xl p-6 mx-auto">
           <a href="/" class="flex items-center flex-shrink-0 mr-6 text-gray-800">
             <%= img_tag(Routes.static_path(@conn, "/images/logo.svg"), class: "w-8 h-8") %>
             <span class="ml-2 text-xl font-semibold tracking-tight leading-none">Growbox</span>
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <main role="main" class="flex flex-grow w-full max-w-screen-xl p-6 mx-auto space-y-6">
+      <main role="main" class="flex flex-grow w-full max-w-screen-2xl p-6 mx-auto space-y-6">
         <div class="grid w-full grid-cols-1 lg:grid-cols-12 lg:gap-x-6 lg:space-y-0">
           <aside class="flex-col justify-between flex-grow hidden space-y-6 lg:col-span-3 lg:flex">
             <%= render "_nav.html", conn: assigns[:conn] || assigns[:socket], current_path: @current_path %>
