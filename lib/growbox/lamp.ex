@@ -1,10 +1,12 @@
 defmodule Growbox.Lamp do
   use GenServer
+  require Logger
 
   def start_link(pin) do
     if Code.ensure_loaded?(pwm_module()) do
-      GenServer.start_link(__MODULE__, pin)
+      GenServer.start_link(__MODULE__, pin, name: __MODULE__)
     else
+      Logger.warn("PWM Module not loaded, lamp will not work!")
       :ignore
     end
   end
