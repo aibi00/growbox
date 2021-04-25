@@ -7,9 +7,7 @@ defmodule GrowboxWeb.HomeLive do
       Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
     end
 
-    socket =
-      socket
-      |> assign(messages: [])
+    socket = socket |> assign(current_state: %Growbox{})
 
     {:ok, socket}
   end
@@ -43,9 +41,7 @@ defmodule GrowboxWeb.HomeLive do
 
   @impl true
   def handle_info(%Growbox{} = message, socket) do
-    socket =
-      socket
-      |> update(:messages, fn messages -> [message | messages] end)
+    socket = socket |> assign(current_state: message)
 
     {:noreply, socket}
   end

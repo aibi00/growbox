@@ -1,3 +1,8 @@
+<div class="mb-6 grid grid-cols-2 gap-6 lg:grid-cols-4">
+  <%= render GrowboxWeb.HomeView, "_temp.html", assigns %>
+</div>
+
+
 <a class="flex flex-col h-full bg-white rounded-lg shadow-md" href="/">
   <header class="flex-grow px-4 pt-4 text-sm font-bold tracking-widest text-left text-gray-600 uppercase">
     Temperature

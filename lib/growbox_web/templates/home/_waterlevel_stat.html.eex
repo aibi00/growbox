@@ -1,0 +1,9 @@
+<a class="flex flex-col justify-between h-full bg-white rounded-lg shadow-md" href="/">
+  <header class="px-4 pt-4 text-sm font-bold tracking-widest text-left text-gray-600 uppercase">
+    Waterlevel
+  </header>
+
+  <main class="p-4">
+    <strong class="text-4xl leading-none"><%= @current_state.water_level %></strong>
+  </main>
+</a>
