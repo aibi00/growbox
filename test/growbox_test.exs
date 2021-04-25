@@ -1,53 +1,49 @@
 defmodule GrowboxTest do
   use ExUnit.Case
 
-  setup do
+  setup env do
     Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
-    start_supervised!(Growbox)
+
+    case env do
+      %{datetime: datetime} -> start_supervised!({Growbox, now: DateTime.to_unix(datetime)})
+      _ -> start_supervised!(Growbox)
+    end
+
     :ok
   end
 
   describe "start_link/1" do
     test "publishes state via pubsub" do
-      Growbox.start_link([])
       assert_receive %Growbox{}
     end
 
+    @tag datetime: ~U[2020-01-01 12:00:00.0Z]
     test "switches lamp automatically on during the day" do
-      {:ok, _pid} = FakeDateTime.start_link(~U[2020-01-01 12:00:00.0Z])
-      Growbox.start_link([])
-
-      :timer.sleep(5)
       assert_receive %Growbox{lamp: {:automatic, :on}}
     end
 
+    @tag datetime: ~U[2020-01-01 00:00:00.0Z]
     test "does nothing with the lamp during the night" do
-      {:ok, _pid} = FakeDateTime.start_link(~U[2020-01-01 00:00:00.0Z])
-      Growbox.start_link([])
-
-      :timer.sleep(5)
       assert_receive %Growbox{lamp: {:automatic, :off}}
     end
   end
 
   describe "manual_on/1" do
     test "switches lamp on when in automatic mode" do
-      Growbox.start_link([])
+      :sys.replace_state(Growbox, fn state -> %{state | lamp: {:automatic, :off}} end)
+
       Growbox.manual_on(:lamp)
       assert_receive %Growbox{lamp: {:manual, :on}}
     end
 
     test "switches lamp on when in manual mode" do
-      Growbox.start_link([])
-      # Set mode to manual
-      Growbox.manual_on(:lamp)
+      :sys.replace_state(Growbox, fn state -> %{state | lamp: {:manual, :off}} end)
 
       Growbox.manual_on(:lamp)
       assert_receive %Growbox{lamp: {:manual, :on}}
     end
 
     test "does nothing when lamp is too hot" do
-      Growbox.start_link([])
       :sys.replace_state(Growbox, fn state -> %{state | lamp: :too_hot} end)
 
       Growbox.manual_on(:lamp)
@@ -57,23 +53,20 @@ defmodule GrowboxTest do
 
   describe "manual_off/1" do
     test "switches lamp off when in automatic mode" do
-      Growbox.start_link([])
-      Growbox.manual_off(:lamp)
+      :sys.replace_state(Growbox, fn state -> %{state | lamp: {:automatic, :on}} end)
 
+      Growbox.manual_off(:lamp)
       assert_receive %Growbox{lamp: {:manual, :off}}
     end
 
     test "switches lamp off when in manual mode" do
-      Growbox.start_link([])
-      # Set mode to manual
-      Growbox.manual_off(:lamp)
+      :sys.replace_state(Growbox, fn state -> %{state | lamp: {:manual, :on}} end)
 
       Growbox.manual_off(:lamp)
       assert_receive %Growbox{lamp: {:manual, :off}}
     end
 
     test "does nothing when lamp is too hot" do
-      Growbox.start_link([])
       :sys.replace_state(Growbox, fn state -> %{state | lamp: :too_hot} end)
 
       Growbox.manual_off(:lamp)
@@ -83,51 +76,39 @@ defmodule GrowboxTest do
 
   describe "set values from website" do
     test "set_brightness/1" do
-      Growbox.start_link([])
-
       Growbox.set_brightness(0)
-      assert_receive %Growbox{brightness: 0}
+      assert_receive %Growbox{brightness: 0.0}
 
       Growbox.set_brightness(0.5)
       assert_receive %Growbox{brightness: 0.5}
 
       Growbox.set_brightness(1)
-      assert_receive %Growbox{brightness: 1}
+      assert_receive %Growbox{brightness: 1.0}
+    end
+
+    test "set_max_ph/1" do
+      Growbox.set_max_ph(9)
+      assert_receive %Growbox{max_ph: 9.0}
+    end
+
+    test "set_min_ph/1" do
+      Growbox.set_min_ph(3)
+      assert_receive %Growbox{min_ph: 3.0}
+    end
+
+    test "set_max_ec/1" do
+      Growbox.set_max_ec(2)
+      assert_receive %Growbox{max_ec: 2.0}
     end
 
     test "set_pump_on_time/1" do
-      Growbox.start_link([])
-
       Growbox.set_pump_on_time(9001)
       assert_receive %Growbox{pump_on_time: 9001}
     end
 
     test "set_pump_off_time/1" do
-      Growbox.start_link([])
-
       Growbox.set_pump_off_time(9001)
       assert_receive %Growbox{pump_off_time: 9001}
-    end
-
-    test "set_max_ph/1" do
-      Growbox.start_link([])
-
-      Growbox.set_max_ph(9)
-      assert_receive %Growbox{max_ph: 9}
-    end
-
-    test "set_min_ph/1" do
-      Growbox.start_link([])
-
-      Growbox.set_min_ph(3)
-      assert_receive %Growbox{min_ph: 3}
-    end
-
-    test "set_max_ec/1" do
-      Growbox.start_link([])
-
-      Growbox.set_max_ec(2)
-      assert_receive %Growbox{max_ec: 2}
     end
   end
 
@@ -139,11 +120,11 @@ defmodule GrowboxTest do
         pump_on_time: 10
       }
 
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) == {:automatic, :off}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 14}) == {:automatic, :off}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 15}) == {:automatic, :on}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 24}) == {:automatic, :on}
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 25}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 0}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 14}) == {:automatic, :off}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 15}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 24}) == {:automatic, :on}
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 25}) == {:automatic, :off}
     end
 
     test "manual mode" do
@@ -153,13 +134,13 @@ defmodule GrowboxTest do
         pump_on_time: 10
       }
 
-      assert Growbox.pump_cycle(%Growbox{default_state | counter: 0}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | unixtime: 0}) ==
                {:manual, :off}
 
-      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 0}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, unixtime: 0}) ==
                {:manual, :on}
 
-      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, counter: 15}) ==
+      assert Growbox.pump_cycle(%Growbox{default_state | pump: {:manual, :on}, unixtime: 15}) ==
                {:manual, :on}
     end
   end
@@ -187,8 +168,8 @@ defmodule GrowboxTest do
              } = :sys.get_state(Growbox)
     end
 
-    test "when the big pump is automatically on, smalls pumps are blocked" do
-      :sys.replace_state(Growbox, fn state -> %{state | counter: 901} end)
+    test "when the big pump is automatically working, smalls pumps are blocked" do
+      :sys.replace_state(Growbox, fn state -> %{state | unixtime: 901} end)
       send(Growbox, {:automatic_on_or_off, :pump})
 
       assert %{
@@ -216,13 +197,12 @@ defmodule GrowboxTest do
   describe "sensor data" do
     test "receiving high pH value" do
       send(Growbox, {:ph, 6.4})
-
       assert %{ph_down_pump: :on, ph_up_pump: :off, ph: 6.4} = :sys.get_state(Growbox)
     end
 
     test "receiving normal pH value" do
       send(Growbox, {:ph, 6})
-      assert %{ph_down_pump: :off, ph_up_pump: :off, ph: 6} = :sys.get_state(Growbox)
+      assert %{ph_down_pump: :off, ph_up_pump: :off, ph: 6.0} = :sys.get_state(Growbox)
     end
 
     test "receiving low pH value" do
@@ -237,7 +217,7 @@ defmodule GrowboxTest do
 
     test "receiving low ec value" do
       send(Growbox, {:ec, 1})
-      assert %{ec_pump: :on, ec: 1} = :sys.get_state(Growbox)
+      assert %{ec_pump: :on, ec: 1.0} = :sys.get_state(Growbox)
     end
 
     test "receiving a high water level" do
@@ -258,12 +238,12 @@ defmodule GrowboxTest do
     test "receiving normal temperature" do
       lamp_state = :sys.get_state(Growbox).lamp
       send(Growbox, {:temperature, 65})
-      assert %{temperature: 65, lamp: ^lamp_state} = :sys.get_state(Growbox)
+      assert %{temperature: 65.0, lamp: ^lamp_state} = :sys.get_state(Growbox)
     end
 
     test "receiving high temperature" do
       send(Growbox, {:temperature, 71})
-      assert %{temperature: 71, lamp: :too_hot} = :sys.get_state(Growbox)
+      assert %{temperature: 71.0, lamp: :too_hot} = :sys.get_state(Growbox)
     end
   end
 end

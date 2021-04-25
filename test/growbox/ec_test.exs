@@ -3,7 +3,7 @@ defmodule Growbox.ECTest do
   alias Growbox.EC
 
   describe "calc_ec/1" do
-    test "calculate ec value" do
+    test "calculates ec value" do
       assert EC.calc_ec(0) == 0
       assert EC.calc_ec(1023) > 1.5
     end

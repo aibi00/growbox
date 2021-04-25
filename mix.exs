@@ -73,7 +73,6 @@ defmodule Growbox.MixProject do
       {:nerves_system_x86_64, "~> 1.14.0", runtime: false, targets: :x86_64},
 
       # Phoenix dependencies
-      {:ecto_sqlite3, "~> 0.5.4"},
       {:floki, ">= 0.27.0", only: :test},
       {:jason, "~> 1.0"},
       {:phoenix, "~> 1.5.8"},
@@ -98,8 +97,7 @@ defmodule Growbox.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "cmd npm install --prefix assets --legacy-peer-deps"],
-      burn: ["cmd npm run deploy --prefix assets", "phx.digest", "firmware", "firmware.burn"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      burn: ["cmd npm run deploy --prefix assets", "phx.digest", "firmware", "firmware.burn"]
     ]
   end
 end

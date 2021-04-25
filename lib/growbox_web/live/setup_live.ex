@@ -20,7 +20,7 @@ defmodule GrowboxWeb.SetupLive do
   @impl true
   def handle_event("start", _, socket) do
     socket =
-      case Growbox.start([]) do
+      case Growbox.start_link([]) do
         {:ok, _pid} -> redirect(socket, to: "/home")
         _ -> socket
       end

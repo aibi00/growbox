@@ -1,12 +1,8 @@
 import Config
 
-config :growbox, :datetime, FakeDateTime
 config :growbox, :pwm, FakePwm
 config :growbox, :gpio, FakeGPIO
 config :growbox, :child_processes, []
-
-# Configure your database
-config :growbox, Growbox.Repo, pool: Ecto.Adapters.SQL.Sandbox
 
 # Phoenix configuration
 

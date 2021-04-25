@@ -21,8 +21,6 @@ config :growbox, GrowboxWeb.Endpoint,
     ]
   ]
 
-config :growbox, Growbox.Repo, database: "dev.db"
-
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
