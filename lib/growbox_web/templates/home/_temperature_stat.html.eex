@@ -4,6 +4,6 @@
   </header>
 
   <main class="p-4">
-    <strong class="text-4xl leading-none"><%= @current_state.temperature %> °C</strong>
+    <strong class="text-4xl leading-none"><%= Number.Delimit.number_to_delimited(@current_state.temperature) %> °C</strong>
   </main>
 </a>

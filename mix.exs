@@ -76,6 +76,7 @@ defmodule Growbox.MixProject do
       {:nimble_csv, "~> 1.0"},
       {:floki, ">= 0.27.0", only: :test},
       {:jason, "~> 1.0"},
+      {:number, "~> 1.0.3"},
       {:phoenix, "~> 1.5.8"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.14"},
