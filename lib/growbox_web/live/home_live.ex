@@ -35,7 +35,9 @@ defmodule GrowboxWeb.HomeLive do
 
   @impl true
   def handle_event("stop", _params, socket) do
-    Growbox.stop()
+    Supervisor.terminate_child(Growbox.Supervisor, Growbox)
+    Supervisor.delete_child(Growbox.Supervisor, Growbox)
+
     {:noreply, redirect(socket, to: Routes.setup_path(socket, :index))}
   end
 
