@@ -7,7 +7,7 @@ defmodule GrowboxWeb.HomeLive do
       Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
     end
 
-    socket = socket |> assign(current_state: %Growbox{})
+    socket = socket |> assign(current_state: :loading)
 
     {:ok, socket}
   end
@@ -28,6 +28,25 @@ defmodule GrowboxWeb.HomeLive do
   @impl true
   def handle_event("lamp-off", _params, socket) do
     Growbox.manual_off(:lamp)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("pump-on", _params, socket) do
+    Growbox.manual_on(:pump)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("pump-off", _params, socket) do
+    Growbox.manual_off(:pump)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("set-brightness", %{"brightness" => value}, socket) do
+    {value, _} = Integer.parse(value)
+    Growbox.set_brightness(value / 100)
     {:noreply, socket}
   end
 
