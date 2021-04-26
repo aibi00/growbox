@@ -71,7 +71,19 @@ config :vintage_net,
        type: VintageNetEthernet,
        ipv4: %{method: :dhcp}
      }},
-    {"wlan0", %{type: VintageNetWiFi}}
+    {"wlan0",
+     %{
+       type: VintageNetWiFi,
+       vintage_net_wifi: %{
+         networks: [
+           %{
+             key_mgmt: :wpa_psk,
+             ssid: "AB iPhone",
+             psk: "123456789"
+           }
+         ]
+       }
+     }}
   ]
 
 config :mdns_lite,
