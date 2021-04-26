@@ -5,9 +5,9 @@
 
   <main class="p-4">
     <%= case @current_state.water_level do %>
-    <% :too_low -> %><strong class="text-4xl leading-none text-red-500">Too low</strong>
+    <% :too_low -> %><strong class="text-4xl leading-none text-red-500">Too Low</strong>
     <% :normal -> %><strong class="text-4xl leading-none">Normal</strong>
-    <% :too_high -> %><strong class="text-4xl leading-none">Too high</strong>
+    <% :too_high -> %><strong class="text-4xl leading-none text-red-500">Too High</strong>
     <% end %>
   </main>
 </div>
