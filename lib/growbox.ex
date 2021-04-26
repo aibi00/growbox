@@ -325,7 +325,9 @@ defmodule Growbox do
     case state.lamp do
       :automatic_on -> new_automatic_lamp_state
       :automatic_off -> new_automatic_lamp_state
-      _ -> state.lamp
+      :manual_on -> new_automatic_lamp_state
+      :manual_off -> new_automatic_lamp_state
+      :too_hot -> :too_hot
     end
   end
 
