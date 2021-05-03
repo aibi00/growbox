@@ -13,9 +13,10 @@ defmodule Growbox.Application do
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
         GrowboxWeb.Endpoint,
-        Growbox.Warnings,
         Growbox.Database
-      ] ++ children(target())
+      ] ++
+        children(target()) ++
+        Application.get_env(:growbox, :child_processes, [])
 
     opts = [strategy: :one_for_one, name: Growbox.Supervisor]
     Supervisor.start_link(children, opts)
@@ -32,7 +33,7 @@ defmodule Growbox.Application do
 
   # Stuff only booted on Raspberry Pi
   def children(_target) do
-    Application.get_env(:growbox, :child_processes, [
+    [
       {Growbox.Lamp, 18},
       {Growbox.Pump, 17},
       {Growbox.SmallPump, [5, :ec2_pump]},
@@ -49,7 +50,7 @@ defmodule Growbox.Application do
       {Growbox.Temp, [5, 6, 7]},
       {Growbox.PH, 4},
       {Growbox.EC, 3}
-    ])
+    ]
   end
 
   def target() do

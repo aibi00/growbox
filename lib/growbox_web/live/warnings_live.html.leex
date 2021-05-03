@@ -1,0 +1,31 @@
+
+<h1 class="text-3xl font-bold leading-tight text-gray-900 flex justify-between items-center">
+  <span>Warnings</span>
+  <button class="text-sm px-4 py-2 font-medium leading-tight text-white border rounded shadow bg-red-500 border-red-500 whitespace-nowrap hover:border-red-600 hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-600 focus:border-red-600" phx-click="clear">Clear All</button>
+</h1>
+
+<div class="px-5 my-5 bg-white divide-gray-200 rounded-md divide-y divide-solid">
+  <%= case @warnings do %>
+  <% [] -> %>
+    <p class="py-5">
+      No Warnings
+    </p>
+  <% warnings -> %>
+    <%= for warning <- warnings do %>
+      <p class="py-5 flex justify-between items-center">
+        <span class="grow"><%= case warning do %>
+          <% {:temperature, message} -> %>Temperature critical at: <%= message.temperature %>
+          <% {:ph, message} -> %> pH critical at: <%= message.ph %>
+          <% {:ec, message} -> %> Nutrient critical at: <%= message.ec %>
+          <% {:water_level, message} -> %> Water Level critical at: <%= message.water_level %>
+          <% end %>
+        </span>
+
+        <span class="text-gray-500">
+          <% {_, %Growbox{unixtime: unixtime}} = warning %>
+          <%= Calendar.strftime(DateTime.shift_zone!(DateTime.from_unix!(unixtime), "Europe/Vienna"), "%Y-%m-%d %H:%M:%S") %>
+        </span>
+      </p>
+    <% end %>
+  <% end %>
+</div>

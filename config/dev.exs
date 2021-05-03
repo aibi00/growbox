@@ -1,5 +1,7 @@
 import Config
 
+config :growbox, :child_processes, [Growbox.Warnings]
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
