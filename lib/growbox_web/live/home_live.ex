@@ -44,6 +44,20 @@ defmodule GrowboxWeb.HomeLive do
   end
 
   @impl true
+  def handle_event("18h", _params, socket) do
+    Growbox.set_lamp_on_time(~T[04:00:00])
+    Growbox.set_lamp_off_time(~T[22:00:00])
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("12h", _params, socket) do
+    Growbox.set_lamp_on_time(~T[07:00:00])
+    Growbox.set_lamp_off_time(~T[19:00:00])
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("set-brightness", %{"brightness" => value}, socket) do
     {value, _} = Integer.parse(value)
     Growbox.set_brightness(value / 100)

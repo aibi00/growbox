@@ -112,5 +112,27 @@
         <button class="px-4 py-2 font-medium leading-tight text-white bg-red-500 border border-red-500 rounded shadow whitespace-nowrap hover:border-red-600 hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-600 focus:border-red-600" phx-click="stop" data-confirm="Are you sure? This can not be undone!">Stop</button>
       </footer>
     </div>
+
+    <div class="flex flex-col justify-between h-full bg-white rounded-lg shadow-md">
+      <header class="px-4 pt-4 text-sm font-bold tracking-widest text-left text-gray-600 uppercase">
+      Time Shift
+      </header>
+
+      <main class="p-4">
+        <strong class="text-4xl leading-none">
+          <%= case growbox.lamp_on do %>
+            <% ~T[04:00:00] -> %>18h Shift
+            <% ~T[07:00:00] -> %>12h Shift
+          <% end %>
+        </strong>
+      </main>
+
+      <footer class="flex items-center justify-between px-4 py-4 rounded-b-lg bg-gray-50">
+      <div>
+          <button class="px-4 py-2 font-medium leading-tight text-white border rounded shadow bg-blue-500 border-blue-500 whitespace-nowrap hover:border-blue-600 hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-600 focus:border-blue-600" phx-click="12h">12h</button>
+          <button class="px-4 py-2 font-medium leading-tight text-white bg-blue-500 border border-blue-500 rounded shadow whitespace-nowrap hover:border-blue-600 hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-600 focus:border-blue-600" phx-click="18h">18h</button>
+      </div>
+      </footer>
+    </div>
   </div>
 <% end %>

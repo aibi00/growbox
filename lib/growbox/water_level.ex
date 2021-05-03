@@ -22,7 +22,7 @@ defmodule Growbox.WaterLevel do
         case {max_value, min_value} do
           {0, 0} -> :too_low
           {0, 1} -> :normal
-          {1, 0} -> raise "impossibru"
+          {1, 0} -> :impossibru
           {1, 1} -> :too_high
         end
 

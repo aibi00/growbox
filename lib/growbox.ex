@@ -20,8 +20,9 @@ defmodule Growbox do
             min_ph: 5.8,
             pump_off_time: 900,
             pump_on_time: 600,
-            lamp_on: ~T[05:00:00],
-            lamp_off: ~T[21:00:00]
+            lamp_on: ~T[04:00:00],
+            lamp_off: ~T[22:00:00],
+            max_temperature: 70
 
   def start_link(opts \\ []) do
     {now, _opts} = Keyword.pop(opts, :now, System.os_time(:second))
@@ -224,7 +225,7 @@ defmodule Growbox do
     new_state = %{state | temperature: to_float(value)}
 
     new_state =
-      if value > 70 do
+      if value > new_state.max_temperature do
         %{new_state | lamp: :too_hot}
       else
         new_state
@@ -282,7 +283,7 @@ defmodule Growbox do
     new_state = %{state | ec: to_float(value)}
 
     new_state =
-      if new_state.lamp_on == ~T[05:00:00] do
+      if new_state.lamp_on == ~T[04:00:00] do
         if new_state.ec < state.max_ec do
           Process.send_after(self(), {:ec1_pump, :off}, :timer.seconds(1))
           %{new_state | ec1_pump: :on}
