@@ -36,19 +36,16 @@ defmodule Growbox.WaterLevelTest do
     assert %{water_level: :normal} = :sys.get_state(Growbox)
   end
 
-  @tag :capture_log
   test "reading only max high", %{max: max, min: min} do
     {:ok, pid} = WaterLevel.start_link([1, 3])
 
     Circuits.GPIO.write(max, 1)
     Circuits.GPIO.write(min, 0)
 
-    Process.flag(:trap_exit, true)
     send(pid, :tick)
     :timer.sleep(5)
 
-    assert_receive {:EXIT, ^pid, {%RuntimeError{message: "impossibru"}, _}}
-    assert Process.alive?(pid) == false
+    assert %{water_level: :impossibru} = :sys.get_state(Growbox)
   end
 
   test "reading both high", %{max: max, min: min} do

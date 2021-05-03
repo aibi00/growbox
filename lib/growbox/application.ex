@@ -13,6 +13,7 @@ defmodule Growbox.Application do
         {Phoenix.PubSub, name: Growbox.PubSub},
         GrowboxWeb.Telemetry,
         GrowboxWeb.Endpoint,
+        Growbox.Warnings,
         Growbox.Database
       ] ++ children(target())
 
@@ -29,6 +30,7 @@ defmodule Growbox.Application do
     ]
   end
 
+  # Stuff only booted on Raspberry Pi
   def children(_target) do
     Application.get_env(:growbox, :child_processes, [
       {Growbox.Lamp, 18},

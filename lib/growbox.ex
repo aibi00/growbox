@@ -3,7 +3,7 @@ defmodule Growbox do
 
   defstruct unixtime: 0,
             ec: 1.2,
-            ph: 7.0,
+            ph: 6.0,
             temperature: 20.0,
             water_level: :normal,
             # Components
@@ -32,6 +32,7 @@ defmodule Growbox do
     {min_ph, _opts} = Keyword.pop(opts, :min_ph, %__MODULE__{}.min_ph)
     {pump_off_time, _opts} = Keyword.pop(opts, :pump_off_time, %__MODULE__{}.pump_off_time)
     {pump_on_time, _opts} = Keyword.pop(opts, :pump_on_time, %__MODULE__{}.pump_on_time)
+    {max_temperature, _opts} = Keyword.pop(opts, :max_temperature, %__MODULE__{}.max_temperature)
 
     GenServer.start_link(
       __MODULE__,
@@ -41,7 +42,8 @@ defmodule Growbox do
         max_ph: max_ph,
         min_ph: min_ph,
         pump_off_time: pump_off_time,
-        pump_on_time: pump_on_time
+        pump_on_time: pump_on_time,
+        max_temperature: max_temperature
       },
       name: __MODULE__
     )
@@ -94,6 +96,10 @@ defmodule Growbox do
 
   def set_lamp_off_time(value) do
     GenServer.cast(__MODULE__, {:lamp_off, value})
+  end
+
+  def set_max_temperature(value) do
+    GenServer.cast(__MODULE__, {:max_temperature, value})
   end
 
   # GenServer API
@@ -205,6 +211,11 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_cast({:max_temperature, value}, state) do
+    new_state = %{state | max_temperature: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   def handle_info({:water_level, value}, state) do
     new_state =
       case value do
@@ -215,6 +226,9 @@ defmodule Growbox do
           %{state | water_level: value}
 
         :too_high ->
+          %{state | water_level: value}
+
+        :impossibru ->
           %{state | water_level: value}
       end
 

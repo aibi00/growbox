@@ -30,7 +30,8 @@ defmodule GrowboxWeb.SetupLive do
          max_ph: elem(Float.parse(params["max_ph"]), 0),
          min_ph: elem(Float.parse(params["min_ph"]), 0),
          pump_off_time: elem(Integer.parse(params["pump_off_time"]), 0),
-         pump_on_time: elem(Integer.parse(params["pump_on_time"]), 0)
+         pump_on_time: elem(Integer.parse(params["pump_on_time"]), 0),
+         max_temperature: elem(Integer.parse(params["max_temperature"]), 0)
        ]}
 
     socket =

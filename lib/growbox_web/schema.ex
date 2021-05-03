@@ -9,6 +9,7 @@ defmodule Growbox.Schema do
     field(:min_ph, :float)
     field(:pump_off_time, :integer)
     field(:pump_on_time, :integer)
+    field(:max_temperature, :integer)
   end
 
   @doc false
@@ -20,8 +21,9 @@ defmodule Growbox.Schema do
       max_ph: defaults.max_ph,
       min_ph: defaults.min_ph,
       pump_off_time: defaults.pump_off_time,
-      pump_on_time: defaults.pump_on_time
+      pump_on_time: defaults.pump_on_time,
+      max_temperature: defaults.max_temperature
     }
-    |> cast(attrs, [:max_ec, :max_ph, :min_ph, :pump_off_time, :pump_on_time])
+    |> cast(attrs, [:max_ec, :max_ph, :min_ph, :pump_off_time, :pump_on_time, :max_temperature])
   end
 end
