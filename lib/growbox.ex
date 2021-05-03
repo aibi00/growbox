@@ -7,19 +7,21 @@ defmodule Growbox do
             temperature: 20.0,
             water_level: :normal,
             # Components
-            ec_pump: :off,
+            ec1_pump: :off,
             lamp: :automatic_off,
             ph_down_pump: :off,
             ph_up_pump: :off,
             pump: :automatic_off,
-            water_pump: :off,
+            ec2_pump: :off,
             # From website
             brightness: 1.0,
             max_ec: 1.4,
             max_ph: 6.2,
             min_ph: 5.8,
             pump_off_time: 900,
-            pump_on_time: 600
+            pump_on_time: 600,
+            lamp_on: ~T[05:00:00],
+            lamp_off: ~T[21:00:00]
 
   def start_link(opts \\ []) do
     {now, _opts} = Keyword.pop(opts, :now, System.os_time(:second))
@@ -85,6 +87,14 @@ defmodule Growbox do
     GenServer.cast(__MODULE__, {:max_ec, value})
   end
 
+  def set_lamp_on_time(value) do
+    GenServer.cast(__MODULE__, {:lamp_on, value})
+  end
+
+  def set_lamp_off_time(value) do
+    GenServer.cast(__MODULE__, {:lamp_off, value})
+  end
+
   # GenServer API
 
   def init(state) do
@@ -130,10 +140,10 @@ defmodule Growbox do
     new_state = %{
       state
       | pump: :manual_on,
-        water_pump: :blocked,
+        ec2_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
-        ec_pump: :blocked
+        ec1_pump: :blocked
     }
 
     Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
@@ -144,10 +154,10 @@ defmodule Growbox do
     new_state = %{
       state
       | pump: :manual_off,
-        water_pump: :blocked,
+        ec2_pump: :blocked,
         ph_up_pump: :blocked,
         ph_down_pump: :blocked,
-        ec_pump: :blocked
+        ec1_pump: :blocked
     }
 
     Process.send_after(self(), {:automatic_on_or_off, :pump}, :timer.minutes(1))
@@ -184,17 +194,27 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_cast({:lamp_on, value}, state) do
+    new_state = %{state | lamp_on: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
+  def handle_cast({:lamp_off, value}, state) do
+    new_state = %{state | lamp_off: value}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   def handle_info({:water_level, value}, state) do
     new_state =
       case value do
         :too_low ->
-          %{state | water_pump: :on, water_level: value}
+          %{state | water_level: value}
 
         :normal ->
-          %{state | water_pump: :off, water_level: value}
+          %{state | water_level: value}
 
         :too_high ->
-          %{state | water_pump: :off, water_level: value}
+          %{state | water_level: value}
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
@@ -239,19 +259,19 @@ defmodule Growbox do
         :automatic_on ->
           %{
             new_state
-            | water_pump: :blocked,
+            | ec2_pump: :blocked,
               ph_up_pump: :blocked,
               ph_down_pump: :blocked,
-              ec_pump: :blocked
+              ec1_pump: :blocked
           }
 
         :automatic_off ->
           %{
             new_state
-            | water_pump: :off,
+            | ec2_pump: :off,
               ph_up_pump: :off,
               ph_down_pump: :off,
-              ec_pump: :off
+              ec1_pump: :off
           }
       end
 
@@ -262,11 +282,20 @@ defmodule Growbox do
     new_state = %{state | ec: to_float(value)}
 
     new_state =
-      if new_state.ec < state.max_ec do
-        Process.send_after(self(), {:ec_pump, :off}, :timer.seconds(1))
-        %{new_state | ec_pump: :on}
+      if new_state.lamp_on == ~T[05:00:00] do
+        if new_state.ec < state.max_ec do
+          Process.send_after(self(), {:ec1_pump, :off}, :timer.seconds(1))
+          %{new_state | ec1_pump: :on}
+        else
+          new_state
+        end
       else
-        new_state
+        if new_state.ec < state.max_ec do
+          Process.send_after(self(), {:ec2_pump, :off}, :timer.seconds(1))
+          %{new_state | ec2_pump: :on}
+        else
+          new_state
+        end
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
@@ -302,8 +331,8 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def handle_info({:ec_pump, :off}, state) do
-    new_state = %{state | ec_pump: :off}
+  def handle_info({:ec1_pump, :off}, state) do
+    new_state = %{state | ec1_pump: :off}
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
@@ -316,7 +345,7 @@ defmodule Growbox do
       |> DateTime.to_time()
 
     new_automatic_lamp_state =
-      if Time.compare(time, ~T[06:00:00]) == :gt && Time.compare(time, ~T[20:00:00]) == :lt do
+      if Time.compare(time, state.lamp_on) == :gt && Time.compare(time, state.lamp_off) == :lt do
         :automatic_on
       else
         :automatic_off

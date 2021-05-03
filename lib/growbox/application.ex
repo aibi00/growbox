@@ -33,10 +33,10 @@ defmodule Growbox.Application do
     Application.get_env(:growbox, :child_processes, [
       {Growbox.Lamp, 18},
       {Growbox.Pump, 17},
-      {Growbox.SmallPump, [5, :water_pump]},
+      {Growbox.SmallPump, [5, :ec2_pump]},
       {Growbox.SmallPump, [6, :ph_up_pump]},
       {Growbox.SmallPump, [16, :ph_down_pump]},
-      {Growbox.SmallPump, [26, :ec_pump]},
+      {Growbox.SmallPump, [26, :ec1_pump]},
       {Growbox.WaterLevel, [27, 22]},
       Picam.Camera,
       %{

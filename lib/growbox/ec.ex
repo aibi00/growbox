@@ -11,7 +11,7 @@ defmodule Growbox.EC do
   end
 
   def init(channel) do
-    Process.send_after(self(), :tick, :timer.seconds(1))
+    Process.send_after(self(), :tick, :timer.seconds(30))
     {:ok, channel}
   end
 

@@ -149,10 +149,10 @@ defmodule GrowboxTest do
     test "on startup the big pump is in automatic mode and the small ones are off" do
       assert %{
                pump: :automatic_off,
-               ec_pump: :off,
+               ec1_pump: :off,
                ph_down_pump: :off,
                ph_up_pump: :off,
-               water_pump: :off
+               ec2_pump: :off
              } = :sys.get_state(Growbox)
     end
 
@@ -161,10 +161,10 @@ defmodule GrowboxTest do
 
       assert %{
                pump: :manual_on,
-               ec_pump: :blocked,
+               ec1_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
-               water_pump: :blocked
+               ec2_pump: :blocked
              } = :sys.get_state(Growbox)
     end
 
@@ -174,10 +174,10 @@ defmodule GrowboxTest do
 
       assert %{
                pump: :automatic_on,
-               ec_pump: :blocked,
+               ec1_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
-               water_pump: :blocked
+               ec2_pump: :blocked
              } = :sys.get_state(Growbox)
     end
 
@@ -186,10 +186,10 @@ defmodule GrowboxTest do
 
       assert %{
                pump: :manual_off,
-               ec_pump: :blocked,
+               ec1_pump: :blocked,
                ph_down_pump: :blocked,
                ph_up_pump: :blocked,
-               water_pump: :blocked
+               ec2_pump: :blocked
              } = :sys.get_state(Growbox)
     end
   end
@@ -210,29 +210,26 @@ defmodule GrowboxTest do
       assert %{ph_down_pump: :off, ph_up_pump: :on, ph: 5.6} = :sys.get_state(Growbox)
     end
 
-    test "receiving high ec value" do
+    test "receiving high ec value and 5am" do
       send(Growbox, {:ec, 1.6})
-      assert %{ec_pump: :off, ec: 1.6} = :sys.get_state(Growbox)
+      assert %{ec1_pump: :off, ec: 1.6} = :sys.get_state(Growbox)
     end
 
-    test "receiving low ec value" do
+    test "receiving high ec value and 6am" do
+      Growbox.set_lamp_on_time(~T[06:00:00])
+      send(Growbox, {:ec, 1.6})
+      assert %{ec2_pump: :off, ec: 1.6} = :sys.get_state(Growbox)
+    end
+
+    test "receiving low ec value and 5am" do
       send(Growbox, {:ec, 1})
-      assert %{ec_pump: :on, ec: 1.0} = :sys.get_state(Growbox)
+      assert %{ec1_pump: :on, ec: 1.0} = :sys.get_state(Growbox)
     end
 
-    test "receiving a high water level" do
-      send(Growbox, {:water_level, :too_high})
-      assert %{water_pump: :off} = :sys.get_state(Growbox)
-    end
-
-    test "receiving a normal water level" do
-      send(Growbox, {:water_level, :normal})
-      assert %{water_pump: :off} = :sys.get_state(Growbox)
-    end
-
-    test "receiving a low water level" do
-      send(Growbox, {:water_level, :too_low})
-      assert %{water_pump: :on} = :sys.get_state(Growbox)
+    test "receiving low ec value and 6am" do
+      Growbox.set_lamp_on_time(~T[06:00:00])
+      send(Growbox, {:ec, 1})
+      assert %{ec2_pump: :on, ec: 1.0} = :sys.get_state(Growbox)
     end
 
     test "receiving normal temperature" do
