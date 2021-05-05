@@ -284,6 +284,15 @@ defmodule Growbox do
               ec1_pump: :blocked
           }
 
+        :manual_on ->
+          %{
+            new_state
+            | ec2_pump: :blocked,
+              ph_up_pump: :blocked,
+              ph_down_pump: :blocked,
+              ec1_pump: :blocked
+          }
+
         :automatic_off ->
           %{
             new_state
@@ -291,6 +300,15 @@ defmodule Growbox do
               ph_up_pump: :off,
               ph_down_pump: :off,
               ec1_pump: :off
+          }
+
+        :manual_off ->
+          %{
+            new_state
+            | ec2_pump: :blocked,
+              ph_up_pump: :blocked,
+              ph_down_pump: :blocked,
+              ec1_pump: :blocked
           }
       end
 
@@ -301,20 +319,24 @@ defmodule Growbox do
     new_state = %{state | ec: to_float(value)}
 
     new_state =
-      if new_state.lamp_on == ~T[04:00:00] do
-        if new_state.ec < state.max_ec do
-          Process.send_after(self(), {:ec1_pump, :off}, :timer.seconds(1))
-          %{new_state | ec1_pump: :on}
+      if new_state.pump == :automatic_off do
+        if new_state.lamp_on == ~T[04:00:00] do
+          if new_state.ec < state.max_ec do
+            Process.send_after(self(), {:ec1_pump, :off}, :timer.seconds(1))
+            %{new_state | ec1_pump: :on}
+          else
+            new_state
+          end
         else
-          new_state
+          if new_state.ec < state.max_ec do
+            Process.send_after(self(), {:ec2_pump, :off}, :timer.seconds(1))
+            %{new_state | ec2_pump: :on}
+          else
+            new_state
+          end
         end
       else
-        if new_state.ec < state.max_ec do
-          Process.send_after(self(), {:ec2_pump, :off}, :timer.seconds(1))
-          %{new_state | ec2_pump: :on}
-        else
-          new_state
-        end
+        new_state
       end
 
     {:noreply, new_state, {:continue, :broadcast}}

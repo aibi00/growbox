@@ -181,6 +181,18 @@ defmodule GrowboxTest do
              } = :sys.get_state(Growbox)
     end
 
+    test "when the big pump is manually on, smalls pumps are blocked" do
+      Growbox.manual_on(:pump)
+
+      assert %{
+               pump: :manual_on,
+               ec1_pump: :blocked,
+               ph_down_pump: :blocked,
+               ph_up_pump: :blocked,
+               ec2_pump: :blocked
+             } = :sys.get_state(Growbox)
+    end
+
     test "when the big pump is manually off, smalls pumps are blocked" do
       Growbox.manual_off(:pump)
 
