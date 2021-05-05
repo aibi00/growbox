@@ -33,8 +33,7 @@ defmodule Growbox do
     {pump_off_time, _opts} = Keyword.pop(opts, :pump_off_time, %__MODULE__{}.pump_off_time)
     {pump_on_time, _opts} = Keyword.pop(opts, :pump_on_time, %__MODULE__{}.pump_on_time)
     {max_temperature, _opts} = Keyword.pop(opts, :max_temperature, %__MODULE__{}.max_temperature)
-    {lamp_on, _opts} = Keyword.pop(opts, :lamp_on, %__MODULE__{}.lamp_on)
-    {lamp_off, _opts} = Keyword.pop(opts, :lamp_off, %__MODULE__{}.lamp_off)
+
 
     GenServer.start_link(
       __MODULE__,
@@ -45,7 +44,9 @@ defmodule Growbox do
         min_ph: min_ph,
         pump_off_time: pump_off_time,
         pump_on_time: pump_on_time,
-        max_temperature: max_temperature
+        max_temperature: max_temperature,
+        lamp_on: lamp_on,
+        lamp_off: lamp_off
       },
       name: __MODULE__
     )
