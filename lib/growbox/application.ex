@@ -34,7 +34,6 @@ defmodule Growbox.Application do
   # Stuff only booted on Raspberry Pi
   def children(_target) do
     [
-      Pigpiox.Supervisor,
       {Growbox.Lamp, 18},
       {Growbox.Pump, 17},
       {Growbox.SmallPump, [5, :ec2_pump]},
