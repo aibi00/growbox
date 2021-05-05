@@ -8,11 +8,11 @@ defmodule Growbox do
             water_level: :normal,
             # Components
             ec1_pump: :off,
+            ec2_pump: :off,
             lamp: :automatic_off,
             ph_down_pump: :off,
             ph_up_pump: :off,
             pump: :automatic_off,
-            ec2_pump: :off,
             # From website
             brightness: 1.0,
             max_ec: 1.4,
