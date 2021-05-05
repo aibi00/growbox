@@ -34,8 +34,7 @@ npm-debug.log
 /priv/static/
 
 # Ignore databases
-*.db
-*.db-*
+database.csv
 
 # Make life on Mac easier
 .DS_Store
