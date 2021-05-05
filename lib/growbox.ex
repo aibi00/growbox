@@ -355,6 +355,11 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_info({:ec2_pump, :off}, state) do
+    new_state = %{state | ec2_pump: :off}
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   # Helpers
 
   defp calc_lamp_state(state) do
