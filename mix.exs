@@ -61,7 +61,7 @@ defmodule Growbox.MixProject do
 
       # Sensors and stuff
       {:circuits_gpio, "~> 0.4"},
-      {:pigpiox, "~> 0.1"},
+      {:pigpiox, "~> 0.1", runtime: false},
       {:mcp300x, "~> 0.1.1"},
 
       # Dependencies for all targets except :host
