@@ -346,17 +346,21 @@ defmodule Growbox do
     new_state = %{state | ph: to_float(value)}
 
     new_state =
-      cond do
-        new_state.ph >= state.max_ph ->
-          Process.send_after(self(), {:ph_down_pump, :off}, :timer.seconds(1))
-          %{new_state | ph_down_pump: :on}
+      if new_state.pump == :automatic_off do
+        cond do
+          new_state.ph >= state.max_ph ->
+            Process.send_after(self(), {:ph_down_pump, :off}, :timer.seconds(1))
+            %{new_state | ph_down_pump: :on}
 
-        new_state.ph <= state.min_ph ->
-          Process.send_after(self(), {:ph_up_pump, :off}, :timer.seconds(1))
-          %{new_state | ph_up_pump: :on}
+          new_state.ph <= state.min_ph ->
+            Process.send_after(self(), {:ph_up_pump, :off}, :timer.seconds(1))
+            %{new_state | ph_up_pump: :on}
 
-        true ->
-          new_state
+          true ->
+            new_state
+        end
+      else
+        new_state
       end
 
     {:noreply, new_state, {:continue, :broadcast}}
