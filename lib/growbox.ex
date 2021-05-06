@@ -7,13 +7,13 @@ defmodule Growbox do
             temperature: 20.0,
             water_level: :normal,
             # Components
+            lamp: :automatic_off,
             ec1_pump: :off,
             ec2_pump: :off,
-            lamp: :automatic_off,
             ph_down_pump: :off,
             ph_up_pump: :off,
             pump: :automatic_off,
-            # From website
+            # Configuration (from website or database)
             brightness: 1.0,
             max_ec: 1.4,
             max_ph: 6.2,
@@ -25,32 +25,9 @@ defmodule Growbox do
             max_temperature: 70
 
   def start_link(opts \\ []) do
-    {now, _opts} = Keyword.pop(opts, :now, System.os_time(:second))
-
-    {max_ec, _opts} = Keyword.pop(opts, :max_ec, %__MODULE__{}.max_ec)
-    {max_ph, _opts} = Keyword.pop(opts, :max_ph, %__MODULE__{}.max_ph)
-    {min_ph, _opts} = Keyword.pop(opts, :min_ph, %__MODULE__{}.min_ph)
-    {pump_off_time, _opts} = Keyword.pop(opts, :pump_off_time, %__MODULE__{}.pump_off_time)
-    {pump_on_time, _opts} = Keyword.pop(opts, :pump_on_time, %__MODULE__{}.pump_on_time)
-    {max_temperature, _opts} = Keyword.pop(opts, :max_temperature, %__MODULE__{}.max_temperature)
-    {lamp_on, _opts} = Keyword.pop(opts, :lamp_on, %__MODULE__{}.lamp_on)
-    {lamp_off, _opts} = Keyword.pop(opts, :lamp_off, %__MODULE__{}.lamp_off)
-
-    GenServer.start_link(
-      __MODULE__,
-      %Growbox{
-        unixtime: now,
-        max_ec: max_ec,
-        max_ph: max_ph,
-        min_ph: min_ph,
-        pump_off_time: pump_off_time,
-        pump_on_time: pump_on_time,
-        max_temperature: max_temperature,
-        lamp_on: lamp_on,
-        lamp_off: lamp_off
-      },
-      name: __MODULE__
-    )
+    opts = Keyword.put_new(opts, :unixtime, System.os_time(:second))
+    state = struct(__MODULE__, opts)
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   def alive? do
@@ -220,6 +197,13 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
+  def handle_info(:tick, state) do
+    new_state = %{state | unixtime: System.os_time(:second)}
+    new_state = %{new_state | pump: calc_pump_state(new_state)}
+
+    {:noreply, new_state, {:continue, :broadcast}}
+  end
+
   def handle_info({:water_level, value}, state) do
     new_state =
       case value do
@@ -252,13 +236,6 @@ defmodule Growbox do
     {:noreply, new_state, {:continue, :broadcast}}
   end
 
-  def handle_info(:tick, state) do
-    new_state = %{state | unixtime: System.os_time(:second)}
-    new_state = %{new_state | pump: calc_pump_state(new_state)}
-
-    {:noreply, new_state, {:continue, :broadcast}}
-  end
-
   def handle_info({:automatic_on_or_off, :lamp}, state) do
     new_state =
       case state.lamp do
@@ -275,40 +252,22 @@ defmodule Growbox do
 
     new_state =
       case new_state.pump do
-        :automatic_on ->
-          %{
-            new_state
-            | ec2_pump: :blocked,
-              ph_up_pump: :blocked,
-              ph_down_pump: :blocked,
-              ec1_pump: :blocked
-          }
-
-        :manual_on ->
-          %{
-            new_state
-            | ec2_pump: :blocked,
-              ph_up_pump: :blocked,
-              ph_down_pump: :blocked,
-              ec1_pump: :blocked
-          }
-
         :automatic_off ->
           %{
             new_state
-            | ec2_pump: :off,
+            | ec1_pump: :off,
+              ec2_pump: :off,
               ph_up_pump: :off,
-              ph_down_pump: :off,
-              ec1_pump: :off
+              ph_down_pump: :off
           }
 
-        :manual_off ->
+        _ ->
           %{
             new_state
-            | ec2_pump: :blocked,
+            | ec1_pump: :blocked,
+              ec2_pump: :blocked,
               ph_up_pump: :blocked,
-              ph_down_pump: :blocked,
-              ec1_pump: :blocked
+              ph_down_pump: :blocked
           }
       end
 

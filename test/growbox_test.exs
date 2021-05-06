@@ -5,7 +5,7 @@ defmodule GrowboxTest do
     Phoenix.PubSub.subscribe(Growbox.PubSub, "growbox")
 
     case env do
-      %{datetime: datetime} -> start_supervised!({Growbox, now: DateTime.to_unix(datetime)})
+      %{datetime: datetime} -> start_supervised!({Growbox, unixtime: DateTime.to_unix(datetime)})
       _ -> start_supervised!(Growbox)
     end
 
@@ -19,12 +19,14 @@ defmodule GrowboxTest do
 
     @tag datetime: ~U[2020-01-01 12:00:00.0Z]
     test "switches lamp automatically on during the day" do
-      assert_receive %Growbox{lamp: :automatic_on}
+      send(Growbox, {:automatic_on_or_off, :lamp})
+      assert %{lamp: :automatic_on} = :sys.get_state(Growbox)
     end
 
     @tag datetime: ~U[2020-01-01 00:00:00.0Z]
     test "does nothing with the lamp during the night" do
-      assert_receive %Growbox{lamp: :automatic_off}
+      send(Growbox, {:automatic_on_or_off, :lamp})
+      assert %{lamp: :automatic_off} = :sys.get_state(Growbox)
     end
   end
 

@@ -7,7 +7,7 @@ defmodule Growbox.WaterLevelTest do
     {:ok, max} = Circuits.GPIO.open(0, :output)
     {:ok, min} = Circuits.GPIO.open(2, :output)
 
-    {:ok, _pid} = Growbox.start_link(now: DateTime.to_unix(~U[2020-01-01 12:00:00.0Z]))
+    start_supervised!(Growbox)
 
     {:ok, max: max, min: min}
   end
